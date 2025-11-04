@@ -7,6 +7,79 @@ from transformers import RobertaTokenizer, RobertaForSequenceClassification
 from deep_translator import GoogleTranslator
 
 # ------------------------------------------------
+# ✨ Professional Modern Styling (No Background Image)
+# ------------------------------------------------
+def add_modern_style():
+    st.markdown(
+        """
+        <style>
+        .stApp {
+            background: radial-gradient(circle at top, #0b132b, #1c2541, #3a506b);
+            color: #f5f6fa;
+            font-family: 'Inter', sans-serif;
+        }
+        h1 {
+            text-align: center;
+            color: #e0e6ed;
+            font-weight: 800;
+            font-size: 2.5em;
+            letter-spacing: 1px;
+            text-shadow: 0 0 15px rgba(100, 181, 246, 0.6);
+        }
+        p, .stMarkdown {
+            color: #dcdde1 !important;
+            font-size: 17px !important;
+            line-height: 1.6;
+        }
+        textarea {
+            background: rgba(255,255,255,0.08);
+            color: #f5f6fa !important;
+            border-radius: 10px !important;
+            border: 1px solid rgba(255,255,255,0.25) !important;
+            font-size: 16px !important;
+        }
+        div.stButton > button {
+            background: linear-gradient(90deg, #00a8cc, #007ea7);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 0.7em 1.5em;
+            font-weight: bold;
+            transition: 0.3s;
+            width: 100%;
+            font-size: 16px;
+        }
+        div.stButton > button:hover {
+            background: linear-gradient(90deg, #007ea7, #00a8cc);
+            transform: scale(1.03);
+            box-shadow: 0 0 20px rgba(0,168,204,0.5);
+        }
+        .stAlert, .stSuccess, .stWarning, .stInfo {
+            background-color: rgba(255,255,255,0.08) !important;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        h2, h3 {
+            color: #8bd3dd;
+            margin-top: 20px;
+        }
+        hr {
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .stCaption {
+            color: #9ca8b8 !important;
+            font-size: 13px;
+            text-align: center;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+add_modern_style()
+
+# ------------------------------------------------
 # Load model and tokenizer directly from Hugging Face
 # ------------------------------------------------
 @st.cache_resource
@@ -73,126 +146,42 @@ resources = {
 }
 
 # ------------------------------------------------
-# 🌙 Enhanced Dark Theme + Animated Header + Glow
-# ------------------------------------------------
-st.markdown("""
-    <style>
-    /* Base dark background */
-    .stApp {
-        background-color: #0b0f16;
-        color: #e8eaed;
-        font-family: 'Segoe UI', sans-serif;
-    }
-
-    /* Animated gradient header */
-    @keyframes gradientMove {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-    h1 {
-        text-align: center;
-        font-weight: 700;
-        font-size: 2.6em;
-        background: linear-gradient(270deg, #00bcd4, #2196f3, #00bcd4);
-        background-size: 600% 600%;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        animation: gradientMove 6s ease infinite;
-    }
-
-    /* Text area with glowing border */
-    textarea {
-        background-color: #1b1f27 !important;
-        color: #e8eaed !important;
-        border-radius: 12px !important;
-        border: 1px solid #30343b !important;
-        box-shadow: 0 0 10px rgba(0, 188, 212, 0.25);
-        transition: box-shadow 0.3s ease-in-out;
-    }
-    textarea:focus {
-        box-shadow: 0 0 18px rgba(33, 150, 243, 0.45);
-        outline: none !important;
-    }
-
-    /* Buttons */
-    div.stButton > button {
-        background: linear-gradient(90deg, #00bcd4, #2196f3);
-        color: white;
-        border-radius: 10px;
-        border: none;
-        font-weight: bold;
-        transition: 0.3s;
-        width: 100%;
-    }
-    div.stButton > button:hover {
-        background: linear-gradient(90deg, #2196f3, #00bcd4);
-        transform: scale(1.03);
-        box-shadow: 0 0 10px rgba(0, 188, 212, 0.5);
-    }
-
-    /* Section Headers */
-    h2, h3, h4 {
-        color: #00bcd4;
-        font-weight: 600;
-    }
-
-    /* Links */
-    a {
-        color: #4fc3f7 !important;
-        text-decoration: none !important;
-    }
-    a:hover {
-        text-decoration: underline !important;
-    }
-
-    /* Info boxes */
-    .stAlert {
-        border-radius: 10px;
-        padding: 10px;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
-# ------------------------------------------------
 # Streamlit UI
 # ------------------------------------------------
-st.title("🧠 Mind Lens")
-
-st.markdown(
-    "<p style='text-align:center; color:#9aa0a6; font-size:17px;'>"
-    "Step in, let your words speak, explore emotions, find balance, and connect with care wherever you are."
-    "</p>",
-    unsafe_allow_html=True
-)
+st.title("🧠 Mind Lens 🔍")
+st.markdown("<p style='text-align:center;'>Step in, let your words speak. Explore emotions, find balance, and connect with care wherever you are.</p>", unsafe_allow_html=True)
 
 user_text = st.text_area("💬 Type or paste your text here:", height=150)
 
-if st.button("🔍 Analyze"):
+if st.button("✨ Analyze Now"):
     if not user_text.strip():
         st.warning("⚠️ Please enter some text.")
     else:
+        # Translate text to English if needed
         try:
             english_text = GoogleTranslator(source='auto', target='en').translate(user_text)
-            st.info("🌍 Text has been translated to English (if needed).")
+            st.info("🌍 Text translated to English (if needed).")
             st.markdown(f"**Translated text:** {english_text}")
         except Exception:
             english_text = user_text
             st.warning("⚠️ Translation service unavailable — using original text.")
 
+        # Tokenize and predict
         inputs = tokenizer(english_text, return_tensors="pt", truncation=True, padding=True, max_length=128)
         with torch.no_grad():
             outputs = model(**inputs)
             pred_class = torch.argmax(outputs.logits, dim=1).item()
 
         label = label_mapping.get(pred_class, "Unknown")
-        st.success(f"**Predicted Mental Health Category:** {label.upper()}")
+        st.success(f"**🩺 Predicted Mental Health Category:** {label.upper()}")
 
-        st.markdown("---")
-        st.subheader("💬 Helpful Suggestions & Resources:")
+        # Display helpful resources
+        st.markdown("<hr>", unsafe_allow_html=True)
+        st.subheader("💡 Helpful Suggestions & Resources:")
         for tip in resources.get(label, []):
             st.markdown(f"- {tip}")
 
-        st.markdown("---")
+        # Disclaimer
+        st.markdown("<hr>", unsafe_allow_html=True)
         st.caption("⚠️ This tool is for informational support only and does not replace professional mental health advice.")
-        st.caption("Disclaimer⚠️: Translations may not be perfect; always seek local professional help when needed.")
+        st.caption("⚠️ Translations may not be perfect; always seek local professional help when needed.")
