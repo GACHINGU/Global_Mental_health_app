@@ -77,14 +77,49 @@ resources = {
 }
 
 # ------------------------------------------------
-# Streamlit UI
+# Streamlit UI Setup
 # ------------------------------------------------
-st.title("🌍 Global Mental Health Support App")
-st.markdown("Analyze text, understand emotions, and get supportive resources — globally and safely.")
+st.set_page_config(page_title="Mind Lens 🔍", layout="centered")
+
+# ✅ Modern background styling with dark overlay
+page_bg = """
+<style>
+[data-testid="stAppViewContainer"] {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+                      url("https://images.unsplash.com/photo-1606788075761-3e226e9a41b3?auto=format&fit=crop&w=1950&q=80");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+[data-testid="stHeader"] {
+    background: rgba(0, 0, 0, 0);
+}
+
+[data-testid="stSidebar"] {
+    background-color: rgba(255, 255, 255, 0.85);
+}
+
+h1, h2, h3, h4, h5, h6, p, label, span, div, input, textarea {
+    color: white !important;
+}
+</style>
+"""
+st.markdown(page_bg, unsafe_allow_html=True)
+
+# ------------------------------------------------
+# App Content
+# ------------------------------------------------
+st.title("🌿 Mind Lens — Discover Your Emotional Landscape")
+
+st.markdown("""
+Step in, let your words speak — explore emotions, find balance,  
+and connect with care wherever you are 💬
+""")
 
 user_text = st.text_area("Type or paste your text here:", height=150)
 
-if st.button("Analyze"):
+if st.button("🔍 Analyze"):
     if not user_text.strip():
         st.warning("⚠️ Please enter some text.")
     else:
