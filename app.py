@@ -7,7 +7,7 @@ from transformers import RobertaTokenizer, RobertaForSequenceClassification
 from deep_translator import GoogleTranslator
 
 # ------------------------------------------------
-# 🌄 Add Background Image (from URL)
+# 🌄 Add Darker Background Image (from URL)
 # ------------------------------------------------
 def add_bg_from_url():
     st.markdown(
@@ -19,7 +19,7 @@ def add_bg_from_url():
             background-position: center;
             background-attachment: fixed;
         }}
-        /* Add a soft dark overlay to improve text visibility */
+        /* Darker overlay to improve text visibility */
         .stApp::before {{
             content: "";
             position: fixed;
@@ -27,7 +27,7 @@ def add_bg_from_url():
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.45); /* adjust transparency */
+            background-color: rgba(0, 0, 0, 0.65); /* darker overlay */
             z-index: -1;
         }}
         </style>
