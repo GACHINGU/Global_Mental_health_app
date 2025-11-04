@@ -7,97 +7,108 @@ from transformers import RobertaTokenizer, RobertaForSequenceClassification
 from deep_translator import GoogleTranslator
 
 # ------------------------------------------------
-# 🌤️ Modern Light Theme Styling
+# ✨ Elegant Centered Layout + Professional Theme
 # ------------------------------------------------
-def add_light_style():
+def add_elegant_style():
     st.markdown(
         """
         <style>
-        /* Base background */
+        /* Global layout */
         .stApp {
-            background: linear-gradient(135deg, #f9fbff, #f4f8fc);
-            color: #1c1c1e;
+            background: linear-gradient(135deg, #f7faff, #e8f1f8);
             font-family: 'Inter', sans-serif;
+            color: #1c1c1e;
         }
 
-        /* Title */
-        h1 {
+        /* Header bar */
+        .main-header {
             text-align: center;
-            color: #1d3557;
-            font-weight: 800;
-            font-size: 2.6em;
+            background: linear-gradient(90deg, #0077b6, #0096c7);
+            color: white;
+            padding: 1.2rem;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+            font-size: 2rem;
+            font-weight: 700;
             letter-spacing: 0.5px;
         }
 
-        /* Paragraphs */
-        p, .stMarkdown {
-            color: #2b2d42 !important;
-            font-size: 17px !important;
-            line-height: 1.6;
+        /* Centered content box */
+        .content-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0px 6px 16px rgba(0,0,0,0.08);
+            width: 75%;
+            margin: 2rem auto;
+            max-width: 800px;
         }
 
-        /* Text Area */
-        textarea {
-            background: #ffffff !important;
-            color: #1c1c1e !important;
-            border-radius: 10px !important;
-            border: 1px solid #ced6e0 !important;
-            font-size: 16px !important;
-            box-shadow: 0px 2px 4px rgba(0,0,0,0.05);
-        }
-
-        /* Button */
+        /* Buttons */
         div.stButton > button {
-            background: linear-gradient(90deg, #0077b6, #0096c7);
+            background: linear-gradient(90deg, #0096c7, #00b4d8);
             color: white;
             border: none;
             border-radius: 10px;
-            padding: 0.7em 1.5em;
+            padding: 0.8em 1.6em;
             font-weight: 600;
-            transition: 0.3s;
-            width: 100%;
             font-size: 16px;
-            box-shadow: 0px 3px 6px rgba(0, 119, 182, 0.3);
+            width: 100%;
+            transition: 0.3s;
+            box-shadow: 0px 3px 6px rgba(0, 150, 199, 0.3);
         }
         div.stButton > button:hover {
-            background: linear-gradient(90deg, #0096c7, #0077b6);
             transform: translateY(-2px);
-            box-shadow: 0px 5px 12px rgba(0, 119, 182, 0.4);
+            box-shadow: 0px 5px 12px rgba(0, 150, 199, 0.4);
+            background: linear-gradient(90deg, #00b4d8, #0096c7);
         }
 
-        /* Info/Alert Cards */
+        /* Text area */
+        textarea {
+            background: #fdfefe !important;
+            border-radius: 10px !important;
+            border: 1px solid #d7e3eb !important;
+            font-size: 16px !important;
+            box-shadow: 0px 2px 6px rgba(0,0,0,0.05);
+        }
+
+        /* Cards (info, warning, etc.) */
         .stAlert, .stSuccess, .stWarning, .stInfo {
             background-color: #ffffff !important;
-            border: 1px solid #e1e8ef !important;
+            border: 1px solid #e6edf3 !important;
             border-radius: 12px !important;
+            box-shadow: 0px 3px 8px rgba(0,0,0,0.05);
             padding: 15px !important;
-            box-shadow: 0px 4px 8px rgba(0,0,0,0.05);
         }
 
-        /* Subheaders */
+        /* Subtitles and sections */
         h2, h3 {
-            color: #005f73;
+            color: #0077b6;
             margin-top: 25px;
         }
 
-        /* Horizontal Rule */
-        hr {
-            border: 1px solid #e0e6ed;
+        /* Description text */
+        .intro-text {
+            text-align: center;
+            font-size: 17px;
+            color: #495057;
+            margin-bottom: 1.5rem;
         }
 
-        /* Captions / Footers */
-        .stCaption {
-            color: #6c757d !important;
-            font-size: 13px;
+        /* Footer */
+        .footer {
             text-align: center;
+            margin-top: 3rem;
+            font-size: 14px;
+            color: #6c757d;
+            padding: 1rem 0;
         }
-
-        /* Center align intro text */
-        .center-text {
-            text-align: center;
-            color: #3a3a3a;
-            font-size: 16.5px;
-            margin-bottom: 25px;
+        .footer a {
+            color: #0096c7;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
         }
 
         /* Smooth transitions */
@@ -109,7 +120,7 @@ def add_light_style():
         unsafe_allow_html=True
     )
 
-add_light_style()
+add_elegant_style()
 
 # ------------------------------------------------
 # Load model and tokenizer
@@ -180,8 +191,11 @@ resources = {
 # ------------------------------------------------
 # Streamlit UI
 # ------------------------------------------------
-st.title("🧠 Mind Lens 🔍")
-st.markdown("<p class='center-text'>Step in, let your words speak. Explore emotions, find balance, and connect with care wherever you are.</p>", unsafe_allow_html=True)
+st.markdown("<div class='main-header'>🧠 Mind Lens</div>", unsafe_allow_html=True)
+
+st.markdown("<div class='content-box'>", unsafe_allow_html=True)
+
+st.markdown("<p class='intro-text'>Let your words reveal your emotional tone. Mind Lens helps you explore, understand, and find balance with care and empathy.</p>", unsafe_allow_html=True)
 
 user_text = st.text_area("💬 Type or paste your text here:", height=150)
 
@@ -217,3 +231,11 @@ if st.button("✨ Analyze Now"):
         st.markdown("<hr>", unsafe_allow_html=True)
         st.caption("⚠️ This tool is for informational support only and does not replace professional mental health advice.")
         st.caption("⚠️ Translations may not be perfect; always seek local professional help when needed.")
+
+st.markdown("</div>", unsafe_allow_html=True)
+
+# Footer
+st.markdown(
+    "<div class='footer'>Made with ❤️ using <a href='https://streamlit.io' target='_blank'>Streamlit</a> | © 2025 Mind Lens</div>",
+    unsafe_allow_html=True
+)
