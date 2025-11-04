@@ -7,105 +7,77 @@ from transformers import RobertaTokenizer, RobertaForSequenceClassification
 from deep_translator import GoogleTranslator
 
 # ------------------------------------------------
-# 🌌 Background + Improved Styling
+# ✨ Professional Modern Styling (No Background Image)
 # ------------------------------------------------
-def add_beautiful_style():
+def add_modern_style():
     st.markdown(
-        f"""
+        """
         <style>
-        /* Background setup */
-        .stApp {{
-            background-image: url("https://i.pinimg.com/1200x/de/47/a4/de47a494d95218de602e749aaf6c9e67.jpg");
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }}
-        .stApp::before {{
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
-            z-index: -1;
-        }}
-
-        /* Title glow */
-        h1 {{
-            color: #f1f2f6;
+        .stApp {
+            background: radial-gradient(circle at top, #0b132b, #1c2541, #3a506b);
+            color: #f5f6fa;
+            font-family: 'Inter', sans-serif;
+        }
+        h1 {
             text-align: center;
-            text-shadow: 0 0 10px #4a69bd, 0 0 20px #6a89cc;
-            font-family: 'Poppins', sans-serif;
+            color: #e0e6ed;
             font-weight: 800;
-        }}
-
-        /* Subtext */
-        p, .stMarkdown {{
+            font-size: 2.5em;
+            letter-spacing: 1px;
+            text-shadow: 0 0 15px rgba(100, 181, 246, 0.6);
+        }
+        p, .stMarkdown {
             color: #dcdde1 !important;
             font-size: 17px !important;
             line-height: 1.6;
-            font-family: 'Open Sans', sans-serif;
-        }}
-
-        /* Card look for text area and results */
-        .stTextArea, .stAlert, .stSuccess, .stWarning, .stInfo {{
-            background-color: rgba(255, 255, 255, 0.08) !important;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 15px;
-        }}
-
-        textarea {{
-            background-color: rgba(255,255,255,0.1) !important;
-            color: white !important;
+        }
+        textarea {
+            background: rgba(255,255,255,0.08);
+            color: #f5f6fa !important;
             border-radius: 10px !important;
-            border: 1px solid rgba(255,255,255,0.3) !important;
+            border: 1px solid rgba(255,255,255,0.25) !important;
             font-size: 16px !important;
-        }}
-
-        /* Button */
-        div.stButton > button {{
-            background: linear-gradient(90deg, #4a69bd, #6a89cc);
+        }
+        div.stButton > button {
+            background: linear-gradient(90deg, #00a8cc, #007ea7);
             color: white;
             border: none;
             border-radius: 10px;
-            padding: 0.6em 1.5em;
+            padding: 0.7em 1.5em;
             font-weight: bold;
             transition: 0.3s;
             width: 100%;
             font-size: 16px;
-        }}
-        div.stButton > button:hover {{
-            background: linear-gradient(90deg, #6a89cc, #4a69bd);
+        }
+        div.stButton > button:hover {
+            background: linear-gradient(90deg, #007ea7, #00a8cc);
             transform: scale(1.03);
-            box-shadow: 0 0 15px #4a69bd;
-        }}
-
-        /* Subheaders */
-        h2, h3 {{
-            color: #82ccdd;
-            text-shadow: 0 0 5px #3c6382;
+            box-shadow: 0 0 20px rgba(0,168,204,0.5);
+        }
+        .stAlert, .stSuccess, .stWarning, .stInfo {
+            background-color: rgba(255,255,255,0.08) !important;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        h2, h3 {
+            color: #8bd3dd;
             margin-top: 20px;
-        }}
-
-        /* Horizontal rule */
-        hr {{
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }}
-
-        /* Footer captions */
-        .stCaption {{
-            color: #95a5a6 !important;
+        }
+        hr {
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .stCaption {
+            color: #9ca8b8 !important;
             font-size: 13px;
             text-align: center;
-        }}
+        }
         </style>
         """,
         unsafe_allow_html=True
     )
 
-add_beautiful_style()
+add_modern_style()
 
 # ------------------------------------------------
 # Load model and tokenizer directly from Hugging Face
