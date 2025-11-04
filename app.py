@@ -36,39 +36,39 @@ label_mapping = {
 # ------------------------------------------------
 resources = {
     "anxiety": [
-        "🧘 Try slow breathing: inhale 4s, hold 4s, exhale 6s.",
-        "🌿 Visit: [anxietycentre.com](https://www.anxietycentre.com)",
-        "💬 Talk to a trusted friend or counselor."
+        "Try slow breathing: inhale 4s, hold 4s, exhale 6s.",
+        "Visit: [anxietycentre.com](https://www.anxietycentre.com)",
+        "Talk to a trusted friend or counselor."
     ],
     "depression": [
-        "🤝 You’re not alone — reaching out helps more than you think.",
-        "📞 Call your local helpline or message a friend.",
-        "🌍 Resource: [findahelpline.com](https://findahelpline.com)"
+        "You’re not alone — reaching out helps more than you think.",
+        "Call your local helpline or message a friend.",
+        "Resource: [findahelpline.com](https://findahelpline.com)"
     ],
     "stress": [
-        "🚶 Take a short walk or stretch for 5 minutes.",
-        "🎵 Listen to calm music or practice deep breathing.",
-        "📘 Resource: [stress.org](https://www.stress.org)"
+        "Take a short walk or stretch for 5 minutes.",
+        "Listen to calm music or practice deep breathing.",
+        "Resource: [stress.org](https://www.stress.org)"
     ],
     "bipolar": [
-        "🗓️ Track your mood daily to notice patterns.",
-        "🌙 Keep routines consistent — especially sleep.",
-        "📚 Learn more: [nami.org](https://www.nami.org)"
+        "Track your mood daily to notice patterns.",
+        "Keep routines consistent — especially sleep.",
+        "Learn more: [nami.org](https://www.nami.org)"
     ],
     "personality disorder": [
-        "🧠 Therapy can help you understand yourself better.",
-        "✍️ Try journaling to track emotions and triggers.",
-        "🌍 Info: [mind.org.uk](https://www.mind.org.uk)"
+        "Therapy can help you understand yourself better.",
+        "Try journaling to track emotions and triggers.",
+        "Info: [mind.org.uk](https://www.mind.org.uk)"
     ],
     "suicidal": [
-        "🚨 If you feel unsafe, **please reach out now**.",
-        "🌍 Find help: [findahelpline.com](https://findahelpline.com)",
+        "If you feel unsafe, **please reach out now**.",
+        "Find help: [findahelpline.com](https://findahelpline.com)",
         "🇰🇪 Kenya: Befrienders Kenya – 0722 178177",
         "🇺🇸 US: 988 Suicide & Crisis Lifeline"
     ],
     "normal": [
-        "🌞 You seem balanced — keep practicing healthy habits!",
-        "💬 Maintain connections and take regular breaks."
+        "You seem balanced — keep practicing healthy habits!",
+        "Maintain connections and take regular breaks."
     ]
 }
 
@@ -82,7 +82,7 @@ st.markdown("""
     /* Background with overlay */
     [data-testid="stAppViewContainer"] {
         background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
-                    url("https://images.unsplash.com/photo-1508385082359-f38ae991e8f2?auto=format&fit=crop&w=1950&q=80");
+                    url("https://images.unsplash.com/photo-1526378722439-74c2f17c1b04?auto=format&fit=crop&w=1950&q=80");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
