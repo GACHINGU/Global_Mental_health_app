@@ -8,7 +8,7 @@ from deep_translator import GoogleTranslator
 import time
 
 # ------------------------------------------------
-# ✨ Elegant Styling with Animations
+# ✨ Elegant Styling (Fixed Text Visibility)
 # ------------------------------------------------
 def add_elegant_style():
     st.markdown(
@@ -69,7 +69,8 @@ def add_elegant_style():
 
         /* Text area */
         textarea {
-            background: #fdfefe !important;
+            background: #ffffff !important; /* Pure white */
+            color: #1a1a1a !important; /* Dark readable text */
             border-radius: 10px !important;
             border: 1px solid #d7e3eb !important;
             font-size: 16px !important;
@@ -82,12 +83,11 @@ def add_elegant_style():
             100% {opacity: 1; transform: translateY(0);}
         }
 
-        /* Results section animation */
+        /* Results animation */
         .fade-in {
             animation: fadeIn 1s ease-in-out forwards;
         }
 
-        /* Subtitle and info text */
         h2, h3 {
             color: #0077b6;
             margin-top: 25px;
@@ -218,7 +218,6 @@ if st.button("✨ Analyze Now"):
 
             label = label_mapping.get(pred_class, "Unknown")
 
-        # Fade-in results
         st.markdown(
             f"""
             <div class='fade-in'>
@@ -240,7 +239,6 @@ if st.button("✨ Analyze Now"):
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-# Footer
 st.markdown(
     "<div class='footer'>Made with ❤️ using <a href='https://streamlit.io' target='_blank'>Streamlit</a> | © 2025 Mind Lens</div>",
     unsafe_allow_html=True
