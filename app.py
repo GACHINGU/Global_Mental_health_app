@@ -7,19 +7,15 @@ from transformers import RobertaTokenizer, RobertaForSequenceClassification
 from deep_translator import GoogleTranslator
 
 # ------------------------------------------------
-# Load model and tokenizer directly from Hugging Face
+# Load model and tokenizer
 # ------------------------------------------------
 @st.cache_resource
 def load_model_and_tokenizer():
-    """
-    Load Roberta model and tokenizer from Hugging Face repo.
-    """
-    repo_id = "Legend092/roberta-mentalhealth"  # Hugging Face repo
+    repo_id = "Legend092/roberta-mentalhealth"
     model = RobertaForSequenceClassification.from_pretrained(repo_id)
     tokenizer = RobertaTokenizer.from_pretrained(repo_id)
     return model, tokenizer
 
-# Initialize model and tokenizer
 model, tokenizer = load_model_and_tokenizer()
 
 # ------------------------------------------------
@@ -40,90 +36,135 @@ label_mapping = {
 # ------------------------------------------------
 resources = {
     "anxiety": [
-        "Try slow breathing: inhale 4s, hold 4s, exhale 6s.",
-        "Visit: [https://www.anxietycentre.com](https://www.anxietycentre.com)",
-        "Talk to a trusted friend or counselor."
+        "🧘 Try slow breathing: inhale 4s, hold 4s, exhale 6s.",
+        "🌿 Visit: [anxietycentre.com](https://www.anxietycentre.com)",
+        "💬 Talk to a trusted friend or counselor."
     ],
     "depression": [
-        "You’re not alone — reaching out helps more than you think.",
-        "Call your local helpline or message a friend.",
-        "Resource: [https://findahelpline.com](https://findahelpline.com)"
+        "🤝 You’re not alone — reaching out helps more than you think.",
+        "📞 Call your local helpline or message a friend.",
+        "🌍 Resource: [findahelpline.com](https://findahelpline.com)"
     ],
     "stress": [
-        "Take a short walk or stretch for 5 minutes.",
-        "Practice deep breathing or listen to calm music.",
-        "Resource: [https://www.stress.org](https://www.stress.org)"
+        "🚶 Take a short walk or stretch for 5 minutes.",
+        "🎵 Listen to calm music or practice deep breathing.",
+        "📘 Resource: [stress.org](https://www.stress.org)"
     ],
     "bipolar": [
-        "Track your mood daily to notice patterns.",
-        "Keep routines consistent — especially sleep.",
-        "Learn more: [https://www.nami.org](https://www.nami.org)"
+        "🗓️ Track your mood daily to notice patterns.",
+        "🌙 Keep routines consistent — especially sleep.",
+        "📚 Learn more: [nami.org](https://www.nami.org)"
     ],
     "personality disorder": [
-        "Connecting with a therapist can really help you understand yourself.",
-        "Try journaling to track emotions and triggers.",
-        "Info: [https://www.mind.org.uk](https://www.mind.org.uk)"
+        "🧠 Therapy can help you understand yourself better.",
+        "✍️ Try journaling to track emotions and triggers.",
+        "🌍 Info: [mind.org.uk](https://www.mind.org.uk)"
     ],
     "suicidal": [
-        "If you feel unsafe, **please reach out now**.",
-        "Find help worldwide: [https://findahelpline.com](https://findahelpline.com)",
-        "In Kenya: Befrienders Kenya – 0722 178177",
-        "In the US: 988 Suicide & Crisis Lifeline"
+        "🚨 If you feel unsafe, **please reach out now**.",
+        "🌍 Find help: [findahelpline.com](https://findahelpline.com)",
+        "🇰🇪 Kenya: Befrienders Kenya – 0722 178177",
+        "🇺🇸 US: 988 Suicide & Crisis Lifeline"
     ],
     "normal": [
-        "You seem balanced right now — keep practicing healthy habits!",
-        "Maintain connections and regular breaks for mental wellness."
+        "🌞 You seem balanced — keep practicing healthy habits!",
+        "💬 Maintain connections and take regular breaks."
     ]
 }
 
 # ------------------------------------------------
-# Streamlit UI Setup
+# Page Setup & CSS
 # ------------------------------------------------
 st.set_page_config(page_title="Mind Lens 🔍", layout="centered")
 
-# ✅ Modern background styling with dark overlay
-page_bg = """
-<style>
-[data-testid="stAppViewContainer"] {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-                      url("https://images.unsplash.com/photo-1606788075761-3e226e9a41b3?auto=format&fit=crop&w=1950&q=80");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
-[data-testid="stHeader"] {
-    background: rgba(0, 0, 0, 0);
-}
-
-[data-testid="stSidebar"] {
-    background-color: rgba(255, 255, 255, 0.85);
-}
-
-h1, h2, h3, h4, h5, h6, p, label, span, div, input, textarea {
-    color: white !important;
-}
-</style>
-"""
-st.markdown(page_bg, unsafe_allow_html=True)
-
-# ------------------------------------------------
-# App Content
-# ------------------------------------------------
-st.title("🌿 Mind Lens — Discover Your Emotional Landscape")
-
 st.markdown("""
-Step in, let your words speak — explore emotions, find balance,  
-and connect with care wherever you are 💬
-""")
+    <style>
+    /* Background with overlay */
+    [data-testid="stAppViewContainer"] {
+        background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+                    url("https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1950&q=80");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
 
-user_text = st.text_area("Type or paste your text here:", height=150)
+    /* Sidebar styling */
+    [data-testid="stSidebar"] {
+        background-color: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        color: #000;
+    }
+
+    /* Fonts and text styling */
+    html, body, [class*="css"]  {
+        font-family: 'Poppins', sans-serif;
+    }
+
+    h1 {
+        color: #ffffff;
+        text-align: center;
+        font-size: 2.4em;
+        margin-top: 10px;
+    }
+
+    h2, h3, p, label {
+        color: #f0f0f0 !important;
+    }
+
+    /* Input box styling */
+    textarea {
+        background-color: rgba(255,255,255,0.15) !important;
+        color: #fff !important;
+        border-radius: 10px !important;
+        border: 1px solid #ffffff44 !important;
+    }
+
+    /* Buttons */
+    div.stButton > button:first-child {
+        background-color: #00bfa6;
+        color: white;
+        border-radius: 10px;
+        border: none;
+        padding: 0.6em 1.2em;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    div.stButton > button:first-child:hover {
+        background-color: #00a38d;
+        transform: scale(1.03);
+    }
+
+    /* Card-style resource section */
+    .resource-box {
+        background-color: rgba(255,255,255,0.1);
+        padding: 1em;
+        border-radius: 10px;
+        margin-top: 1em;
+        backdrop-filter: blur(8px);
+    }
+
+    .footer {
+        color: #dddddd;
+        text-align: center;
+        font-size: 0.85em;
+        margin-top: 2em;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# ------------------------------------------------
+# Main UI
+# ------------------------------------------------
+st.markdown("<h1>🌿 Mind Lens — Discover Your Emotional Landscape</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center;'>Step in, let your words speak — explore emotions, find balance, and connect with care wherever you are 💬</p>", unsafe_allow_html=True)
+
+user_text = st.text_area("Type or paste your text here:", height=150, placeholder="Write your thoughts here...")
 
 if st.button("🔍 Analyze"):
     if not user_text.strip():
         st.warning("⚠️ Please enter some text.")
     else:
-        # Translate text to English if needed
         try:
             english_text = GoogleTranslator(source='auto', target='en').translate(user_text)
             st.info("🌍 Text has been translated to English (if needed).")
@@ -132,22 +173,19 @@ if st.button("🔍 Analyze"):
             english_text = user_text
             st.warning("⚠️ Translation service unavailable — using original text.")
 
-        # Tokenize and predict
+        # Model prediction
         inputs = tokenizer(english_text, return_tensors="pt", truncation=True, padding=True, max_length=128)
         with torch.no_grad():
             outputs = model(**inputs)
             pred_class = torch.argmax(outputs.logits, dim=1).item()
 
         label = label_mapping.get(pred_class, "Unknown")
-        st.success(f"**Predicted Mental Health Category:** {label.upper()}")
 
-        # Display helpful resources
-        st.markdown("---")
+        st.markdown(f"<h2 style='color:#00ffc6;'>🧠 Predicted Mental Health Category: {label.upper()}</h2>", unsafe_allow_html=True)
+        st.markdown("<div class='resource-box'>", unsafe_allow_html=True)
         st.subheader("💬 Helpful Suggestions & Resources:")
         for tip in resources.get(label, []):
             st.markdown(f"- {tip}")
+        st.markdown("</div>", unsafe_allow_html=True)
 
-        # Disclaimer
-        st.markdown("---")
-        st.caption("⚠️ This tool is for informational support only and does not replace professional mental health advice.")
-        st.caption("Disclaimer⚠️: Translations may not be perfect; always seek local professional help when needed.")
+        st.markdown("<div class='footer'>⚠️ This tool is for informational support only and does not replace professional mental health advice.<br>Translations may not be perfect; always seek local professional help when needed.</div>", unsafe_allow_html=True)
