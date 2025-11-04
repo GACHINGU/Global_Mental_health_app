@@ -261,7 +261,7 @@ st.markdown("<div class='glow-anim'></div>", unsafe_allow_html=True)
 # ---------------------------
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 st.markdown("<div style='text-align:center'><span class='title'>MIND LENS</span></div>", unsafe_allow_html=True)
-st.markdown("<div class='subtitle'>Futuristic AI dashboard — type your text and let the scanner analyze emotional tone.</div>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>Step in, let your words speak. Explore emotions, find balance, and connect with care wherever you are.</div>", unsafe_allow_html=True)
 
 # Input area (functionality preserved)
 user_text = st.text_area("💬 Type or paste your text here:", height=170)
