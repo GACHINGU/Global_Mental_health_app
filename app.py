@@ -244,13 +244,13 @@ st.markdown(
 # ------------------------------------------------
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 st.markdown("<div style='text-align:center'><h1 class='title'>MIND LENS</h1></div>", unsafe_allow_html=True)
-st.markdown("<div class='subtitle'>Futuristic AI dashboard — type your text and let the scanner analyze emotional tone.</div>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>Step in, let your words speak. Explore emotions, find balance, and connect with care wherever you are.</div>", unsafe_allow_html=True)
 
 # Input area (kept functionality)
 user_text = st.text_area("💬 Type or paste your text here:", height=170)
 
 # BUTTON + SCANNER behaviour:
-analyze_clicked = st.button("🔎 ANALYZE (SCAN)")
+analyze_clicked = st.button("🔎 ANALYZE")
 
 if analyze_clicked:
     if not user_text.strip():
