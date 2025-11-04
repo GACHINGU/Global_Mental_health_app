@@ -7,80 +7,112 @@ from transformers import RobertaTokenizer, RobertaForSequenceClassification
 from deep_translator import GoogleTranslator
 
 # ------------------------------------------------
-# ✨ Professional Modern Styling (No Background Image)
+# 🌤️ Modern Light Theme Styling
 # ------------------------------------------------
-def add_modern_style():
+def add_light_style():
     st.markdown(
         """
         <style>
+        /* Base background */
         .stApp {
-            background: radial-gradient(circle at top, #0b132b, #1c2541, #3a506b);
-            color: #f5f6fa;
+            background: linear-gradient(135deg, #f9fbff, #f4f8fc);
+            color: #1c1c1e;
             font-family: 'Inter', sans-serif;
         }
+
+        /* Title */
         h1 {
             text-align: center;
-            color: #e0e6ed;
+            color: #1d3557;
             font-weight: 800;
-            font-size: 2.5em;
-            letter-spacing: 1px;
-            text-shadow: 0 0 15px rgba(100, 181, 246, 0.6);
+            font-size: 2.6em;
+            letter-spacing: 0.5px;
         }
+
+        /* Paragraphs */
         p, .stMarkdown {
-            color: #dcdde1 !important;
+            color: #2b2d42 !important;
             font-size: 17px !important;
             line-height: 1.6;
         }
+
+        /* Text Area */
         textarea {
-            background: rgba(255,255,255,0.08);
-            color: #f5f6fa !important;
+            background: #ffffff !important;
+            color: #1c1c1e !important;
             border-radius: 10px !important;
-            border: 1px solid rgba(255,255,255,0.25) !important;
+            border: 1px solid #ced6e0 !important;
             font-size: 16px !important;
+            box-shadow: 0px 2px 4px rgba(0,0,0,0.05);
         }
+
+        /* Button */
         div.stButton > button {
-            background: linear-gradient(90deg, #00a8cc, #007ea7);
+            background: linear-gradient(90deg, #0077b6, #0096c7);
             color: white;
             border: none;
             border-radius: 10px;
             padding: 0.7em 1.5em;
-            font-weight: bold;
+            font-weight: 600;
             transition: 0.3s;
             width: 100%;
             font-size: 16px;
+            box-shadow: 0px 3px 6px rgba(0, 119, 182, 0.3);
         }
         div.stButton > button:hover {
-            background: linear-gradient(90deg, #007ea7, #00a8cc);
-            transform: scale(1.03);
-            box-shadow: 0 0 20px rgba(0,168,204,0.5);
+            background: linear-gradient(90deg, #0096c7, #0077b6);
+            transform: translateY(-2px);
+            box-shadow: 0px 5px 12px rgba(0, 119, 182, 0.4);
         }
+
+        /* Info/Alert Cards */
         .stAlert, .stSuccess, .stWarning, .stInfo {
-            background-color: rgba(255,255,255,0.08) !important;
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 10px;
-            padding: 15px;
+            background-color: #ffffff !important;
+            border: 1px solid #e1e8ef !important;
+            border-radius: 12px !important;
+            padding: 15px !important;
+            box-shadow: 0px 4px 8px rgba(0,0,0,0.05);
         }
+
+        /* Subheaders */
         h2, h3 {
-            color: #8bd3dd;
-            margin-top: 20px;
+            color: #005f73;
+            margin-top: 25px;
         }
+
+        /* Horizontal Rule */
         hr {
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid #e0e6ed;
         }
+
+        /* Captions / Footers */
         .stCaption {
-            color: #9ca8b8 !important;
+            color: #6c757d !important;
             font-size: 13px;
             text-align: center;
+        }
+
+        /* Center align intro text */
+        .center-text {
+            text-align: center;
+            color: #3a3a3a;
+            font-size: 16.5px;
+            margin-bottom: 25px;
+        }
+
+        /* Smooth transitions */
+        * {
+            transition: all 0.25s ease-in-out;
         }
         </style>
         """,
         unsafe_allow_html=True
     )
 
-add_modern_style()
+add_light_style()
 
 # ------------------------------------------------
-# Load model and tokenizer directly from Hugging Face
+# Load model and tokenizer
 # ------------------------------------------------
 @st.cache_resource
 def load_model_and_tokenizer():
@@ -149,7 +181,7 @@ resources = {
 # Streamlit UI
 # ------------------------------------------------
 st.title("🧠 Mind Lens 🔍")
-st.markdown("<p style='text-align:center;'>Step in, let your words speak. Explore emotions, find balance, and connect with care wherever you are.</p>", unsafe_allow_html=True)
+st.markdown("<p class='center-text'>Step in, let your words speak. Explore emotions, find balance, and connect with care wherever you are.</p>", unsafe_allow_html=True)
 
 user_text = st.text_area("💬 Type or paste your text here:", height=150)
 
