@@ -11,15 +11,11 @@ from deep_translator import GoogleTranslator
 # ------------------------------------------------
 @st.cache_resource
 def load_model_and_tokenizer():
-    """
-    Load Roberta model and tokenizer from Hugging Face repo.
-    """
-    repo_id = "Legend092/roberta-mentalhealth"  # Hugging Face repo
+    repo_id = "Legend092/roberta-mentalhealth"
     model = RobertaForSequenceClassification.from_pretrained(repo_id)
     tokenizer = RobertaTokenizer.from_pretrained(repo_id)
     return model, tokenizer
 
-# Initialize model and tokenizer
 model, tokenizer = load_model_and_tokenizer()
 
 # ------------------------------------------------
@@ -77,30 +73,46 @@ resources = {
 }
 
 # ------------------------------------------------
-# 🌙 Dark Theme Styling
+# 🌙 Enhanced Dark Theme + Animated Header + Glow
 # ------------------------------------------------
 st.markdown("""
     <style>
-    /* Background */
+    /* Base dark background */
     .stApp {
         background-color: #0b0f16;
         color: #e8eaed;
         font-family: 'Segoe UI', sans-serif;
     }
 
-    /* Title */
+    /* Animated gradient header */
+    @keyframes gradientMove {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
     h1 {
-        color: #76c7c0;
         text-align: center;
         font-weight: 700;
+        font-size: 2.6em;
+        background: linear-gradient(270deg, #00bcd4, #2196f3, #00bcd4);
+        background-size: 600% 600%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: gradientMove 6s ease infinite;
     }
 
-    /* Text Area */
+    /* Text area with glowing border */
     textarea {
         background-color: #1b1f27 !important;
         color: #e8eaed !important;
-        border-radius: 10px !important;
+        border-radius: 12px !important;
         border: 1px solid #30343b !important;
+        box-shadow: 0 0 10px rgba(0, 188, 212, 0.25);
+        transition: box-shadow 0.3s ease-in-out;
+    }
+    textarea:focus {
+        box-shadow: 0 0 18px rgba(33, 150, 243, 0.45);
+        outline: none !important;
     }
 
     /* Buttons */
@@ -111,16 +123,12 @@ st.markdown("""
         border: none;
         font-weight: bold;
         transition: 0.3s;
+        width: 100%;
     }
     div.stButton > button:hover {
         background: linear-gradient(90deg, #2196f3, #00bcd4);
         transform: scale(1.03);
-    }
-
-    /* Info boxes */
-    .stAlert {
-        border-radius: 10px;
-        padding: 10px;
+        box-shadow: 0 0 10px rgba(0, 188, 212, 0.5);
     }
 
     /* Section Headers */
@@ -136,6 +144,12 @@ st.markdown("""
     }
     a:hover {
         text-decoration: underline !important;
+    }
+
+    /* Info boxes */
+    .stAlert {
+        border-radius: 10px;
+        padding: 10px;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -158,7 +172,6 @@ if st.button("🔍 Analyze"):
     if not user_text.strip():
         st.warning("⚠️ Please enter some text.")
     else:
-        # Translate text to English if needed
         try:
             english_text = GoogleTranslator(source='auto', target='en').translate(user_text)
             st.info("🌍 Text has been translated to English (if needed).")
@@ -167,7 +180,6 @@ if st.button("🔍 Analyze"):
             english_text = user_text
             st.warning("⚠️ Translation service unavailable — using original text.")
 
-        # Tokenize and predict
         inputs = tokenizer(english_text, return_tensors="pt", truncation=True, padding=True, max_length=128)
         with torch.no_grad():
             outputs = model(**inputs)
@@ -176,13 +188,11 @@ if st.button("🔍 Analyze"):
         label = label_mapping.get(pred_class, "Unknown")
         st.success(f"**Predicted Mental Health Category:** {label.upper()}")
 
-        # Display helpful resources
         st.markdown("---")
         st.subheader("💬 Helpful Suggestions & Resources:")
         for tip in resources.get(label, []):
             st.markdown(f"- {tip}")
 
-        # Disclaimer
         st.markdown("---")
         st.caption("⚠️ This tool is for informational support only and does not replace professional mental health advice.")
         st.caption("Disclaimer⚠️: Translations may not be perfect; always seek local professional help when needed.")
