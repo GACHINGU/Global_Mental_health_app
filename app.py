@@ -82,7 +82,7 @@ st.markdown("""
     /* Background with overlay */
     [data-testid="stAppViewContainer"] {
         background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
-                    url("https://images.unsplash.com/photo-1593642532973-d31b6557fa68?auto=format&fit=crop&w=1950&q=80");
+                    url("https://images.unsplash.com/photo-1508385082359-f38ae991e8f2?auto=format&fit=crop&w=1950&q=80");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -156,8 +156,8 @@ st.markdown("""
 # ------------------------------------------------
 # Main UI
 # ------------------------------------------------
-st.markdown("<h1>🧠 Mind Lens — Discover Your Emotional Landscape</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align:center;'>Step in, let your words speak — explore emotions, find balance, and connect with care wherever you are 💬</p>", unsafe_allow_html=True)
+st.markdown("<h1> Mind Lens — Discover Your Emotional Landscape 🔍</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center;'>Step in, let your words speak — explore emotions, find balance, and connect with care wherever you are </p>", unsafe_allow_html=True)
 
 user_text = st.text_area("Type or paste your text here:", height=150, placeholder="Write your thoughts here...")
 
