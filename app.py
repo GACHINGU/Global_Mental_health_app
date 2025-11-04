@@ -7,68 +7,105 @@ from transformers import RobertaTokenizer, RobertaForSequenceClassification
 from deep_translator import GoogleTranslator
 
 # ------------------------------------------------
-# 🌈 Modern App Styling (no background image)
+# 🌌 Background + Improved Styling
 # ------------------------------------------------
-def set_clean_style():
+def add_beautiful_style():
     st.markdown(
-        """
+        f"""
         <style>
-        /* Overall App Background */
-        .stApp {
-            background-color: #f9fafc;
-            color: #222;
-        }
+        /* Background setup */
+        .stApp {{
+            background-image: url("https://i.pinimg.com/1200x/de/47/a4/de47a494d95218de602e749aaf6c9e67.jpg");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }}
+        .stApp::before {{
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: -1;
+        }}
 
-        /* Title and Subheader */
-        h1, h2, h3 {
-            color: #3b3b98;
-            font-weight: 700;
-        }
+        /* Title glow */
+        h1 {{
+            color: #f1f2f6;
+            text-align: center;
+            text-shadow: 0 0 10px #4a69bd, 0 0 20px #6a89cc;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+        }}
 
-        /* Buttons */
-        div.stButton > button {
+        /* Subtext */
+        p, .stMarkdown {{
+            color: #dcdde1 !important;
+            font-size: 17px !important;
+            line-height: 1.6;
+            font-family: 'Open Sans', sans-serif;
+        }}
+
+        /* Card look for text area and results */
+        .stTextArea, .stAlert, .stSuccess, .stWarning, .stInfo {{
+            background-color: rgba(255, 255, 255, 0.08) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+        }}
+
+        textarea {{
+            background-color: rgba(255,255,255,0.1) !important;
+            color: white !important;
+            border-radius: 10px !important;
+            border: 1px solid rgba(255,255,255,0.3) !important;
+            font-size: 16px !important;
+        }}
+
+        /* Button */
+        div.stButton > button {{
             background: linear-gradient(90deg, #4a69bd, #6a89cc);
             color: white;
-            font-weight: bold;
+            border: none;
             border-radius: 10px;
             padding: 0.6em 1.5em;
+            font-weight: bold;
             transition: 0.3s;
-        }
-        div.stButton > button:hover {
-            background: linear-gradient(90deg, #6a89cc, #4a69bd);
-            transform: scale(1.02);
-        }
-
-        /* Text Area */
-        textarea {
-            border-radius: 10px !important;
-            border: 1px solid #ced6e0 !important;
-            background-color: #f1f2f6 !important;
-            font-size: 16px !important;
-        }
-
-        /* Info and Results Boxes */
-        .stAlert {
-            border-radius: 10px !important;
-        }
-
-        /* Markdown text */
-        p, li {
+            width: 100%;
             font-size: 16px;
-            line-height: 1.6;
-        }
+        }}
+        div.stButton > button:hover {{
+            background: linear-gradient(90deg, #6a89cc, #4a69bd);
+            transform: scale(1.03);
+            box-shadow: 0 0 15px #4a69bd;
+        }}
 
-        /* Footer text */
-        .stCaption {
+        /* Subheaders */
+        h2, h3 {{
+            color: #82ccdd;
+            text-shadow: 0 0 5px #3c6382;
+            margin-top: 20px;
+        }}
+
+        /* Horizontal rule */
+        hr {{
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }}
+
+        /* Footer captions */
+        .stCaption {{
+            color: #95a5a6 !important;
             font-size: 13px;
-            color: #555;
-        }
+            text-align: center;
+        }}
         </style>
         """,
         unsafe_allow_html=True
     )
 
-set_clean_style()
+add_beautiful_style()
 
 # ------------------------------------------------
 # Load model and tokenizer directly from Hugging Face
@@ -139,15 +176,12 @@ resources = {
 # ------------------------------------------------
 # Streamlit UI
 # ------------------------------------------------
-st.title("🧠 Mind Lens")
-st.markdown(
-    "<p style='font-size:18px;'>Step in, let your words speak. Explore emotions, find balance, and connect with care wherever you are.</p>",
-    unsafe_allow_html=True
-)
+st.title("🧠 Mind Lens 🔍")
+st.markdown("<p style='text-align:center;'>Step in, let your words speak. Explore emotions, find balance, and connect with care wherever you are.</p>", unsafe_allow_html=True)
 
-user_text = st.text_area("📝 Type or paste your text here:", height=150)
+user_text = st.text_area("💬 Type or paste your text here:", height=150)
 
-if st.button("🔍 Analyze"):
+if st.button("✨ Analyze Now"):
     if not user_text.strip():
         st.warning("⚠️ Please enter some text.")
     else:
@@ -167,15 +201,15 @@ if st.button("🔍 Analyze"):
             pred_class = torch.argmax(outputs.logits, dim=1).item()
 
         label = label_mapping.get(pred_class, "Unknown")
-        st.success(f"**Predicted Mental Health Category:** {label.upper()}")
+        st.success(f"**🩺 Predicted Mental Health Category:** {label.upper()}")
 
         # Display helpful resources
-        st.markdown("---")
-        st.subheader("💬 Helpful Suggestions & Resources")
+        st.markdown("<hr>", unsafe_allow_html=True)
+        st.subheader("💡 Helpful Suggestions & Resources:")
         for tip in resources.get(label, []):
             st.markdown(f"- {tip}")
 
         # Disclaimer
-        st.markdown("---")
+        st.markdown("<hr>", unsafe_allow_html=True)
         st.caption("⚠️ This tool is for informational support only and does not replace professional mental health advice.")
         st.caption("⚠️ Translations may not be perfect; always seek local professional help when needed.")
