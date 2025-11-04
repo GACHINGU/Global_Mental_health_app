@@ -79,10 +79,10 @@ st.set_page_config(page_title="Mind Lens 🔍", layout="centered")
 
 st.markdown("""
     <style>
-    /* Background with overlay */
+    /* Background with glowing brain theme */
     [data-testid="stAppViewContainer"] {
         background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
-                    url("https://images.unsplash.com/photo-1593642532973-d31b6557fa68?auto=format&fit=crop&w=1950&q=80");
+                    url("https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&w=1950&q=80");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -103,7 +103,7 @@ st.markdown("""
     h1 {
         color: #ffffff;
         text-align: center;
-        font-size: 2.4em;
+        font-size: 2.6em;
         margin-top: 10px;
     }
 
@@ -115,7 +115,7 @@ st.markdown("""
     textarea {
         background-color: rgba(255,255,255,0.15) !important;
         color: #fff !important;
-        border-radius: 10px !important;
+        border-radius: 12px !important;
         border: 1px solid #ffffff44 !important;
     }
 
@@ -125,23 +125,23 @@ st.markdown("""
         color: white;
         border-radius: 10px;
         border: none;
-        padding: 0.6em 1.2em;
+        padding: 0.7em 1.3em;
         font-weight: 600;
         transition: all 0.3s ease;
     }
 
     div.stButton > button:first-child:hover {
         background-color: #00a38d;
-        transform: scale(1.03);
+        transform: scale(1.05);
     }
 
     /* Card-style resource section */
     .resource-box {
         background-color: rgba(255,255,255,0.1);
         padding: 1em;
-        border-radius: 10px;
+        border-radius: 12px;
         margin-top: 1em;
-        backdrop-filter: blur(8px);
+        backdrop-filter: blur(10px);
     }
 
     .footer {
@@ -156,8 +156,8 @@ st.markdown("""
 # ------------------------------------------------
 # Main UI
 # ------------------------------------------------
-st.markdown("<h1> Mind Lens — Discover Your Emotional Landscape 🔍</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align:center;'>Step in, let your words speak — explore emotions, find balance, and connect with care wherever you are </p>", unsafe_allow_html=True)
+st.markdown("<h1>🧠 Mind Lens — Discover Your Emotional Landscape</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center;'>Let your words speak — explore emotions, find balance, and connect with care 💬</p>", unsafe_allow_html=True)
 
 user_text = st.text_area("Type or paste your text here:", height=150, placeholder="Write your thoughts here...")
 
@@ -181,7 +181,7 @@ if st.button("🔍 Analyze"):
 
         label = label_mapping.get(pred_class, "Unknown")
 
-        st.markdown(f"<h2 style='color:#00ffc6;'>🧠 Predicted Mental Health Category: {label.upper()}</h2>", unsafe_allow_html=True)
+        st.markdown(f"<h2 style='color:#00ffc6;'>💭 Predicted Mental Health Category: {label.upper()}</h2>", unsafe_allow_html=True)
         st.markdown("<div class='resource-box'>", unsafe_allow_html=True)
         st.subheader("💬 Helpful Suggestions & Resources:")
         for tip in resources.get(label, []):
