@@ -7,6 +7,37 @@ from transformers import RobertaTokenizer, RobertaForSequenceClassification
 from deep_translator import GoogleTranslator
 
 # ------------------------------------------------
+# 🌄 Add Background Image (from URL)
+# ------------------------------------------------
+def add_bg_from_url():
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url("https://i.pinimg.com/1200x/de/47/a4/de47a494d95218de602e749aaf6c9e67.jpg");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }}
+        /* Add a soft dark overlay to improve text visibility */
+        .stApp::before {{
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.45); /* adjust transparency */
+            z-index: -1;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+add_bg_from_url()
+
+# ------------------------------------------------
 # Load model and tokenizer directly from Hugging Face
 # ------------------------------------------------
 @st.cache_resource
