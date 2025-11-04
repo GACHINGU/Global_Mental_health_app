@@ -5,22 +5,24 @@ import streamlit as st
 import torch
 from transformers import RobertaTokenizer, RobertaForSequenceClassification
 from deep_translator import GoogleTranslator
+import time
 
 # ------------------------------------------------
-# ✨ Elegant Centered Layout + Professional Theme
+# ✨ Elegant Styling with Animations
 # ------------------------------------------------
 def add_elegant_style():
     st.markdown(
         """
         <style>
-        /* Global layout */
+        /* Global app */
         .stApp {
-            background: linear-gradient(135deg, #f7faff, #e8f1f8);
+            background: linear-gradient(135deg, #eef6fb, #f9fbff);
             font-family: 'Inter', sans-serif;
             color: #1c1c1e;
+            transition: all 0.3s ease;
         }
 
-        /* Header bar */
+        /* Header */
         .main-header {
             text-align: center;
             background: linear-gradient(90deg, #0077b6, #0096c7);
@@ -33,7 +35,7 @@ def add_elegant_style():
             letter-spacing: 0.5px;
         }
 
-        /* Centered content box */
+        /* Centered card */
         .content-box {
             background: #ffffff;
             border-radius: 20px;
@@ -42,6 +44,8 @@ def add_elegant_style():
             width: 75%;
             margin: 2rem auto;
             max-width: 800px;
+            opacity: 0;
+            animation: fadeIn 1s forwards;
         }
 
         /* Buttons */
@@ -72,22 +76,23 @@ def add_elegant_style():
             box-shadow: 0px 2px 6px rgba(0,0,0,0.05);
         }
 
-        /* Cards (info, warning, etc.) */
-        .stAlert, .stSuccess, .stWarning, .stInfo {
-            background-color: #ffffff !important;
-            border: 1px solid #e6edf3 !important;
-            border-radius: 12px !important;
-            box-shadow: 0px 3px 8px rgba(0,0,0,0.05);
-            padding: 15px !important;
+        /* Animations */
+        @keyframes fadeIn {
+            0% {opacity: 0; transform: translateY(15px);}
+            100% {opacity: 1; transform: translateY(0);}
         }
 
-        /* Subtitles and sections */
+        /* Results section animation */
+        .fade-in {
+            animation: fadeIn 1s ease-in-out forwards;
+        }
+
+        /* Subtitle and info text */
         h2, h3 {
             color: #0077b6;
             margin-top: 25px;
         }
 
-        /* Description text */
         .intro-text {
             text-align: center;
             font-size: 17px;
@@ -110,11 +115,6 @@ def add_elegant_style():
         .footer a:hover {
             text-decoration: underline;
         }
-
-        /* Smooth transitions */
-        * {
-            transition: all 0.25s ease-in-out;
-        }
         </style>
         """,
         unsafe_allow_html=True
@@ -123,7 +123,7 @@ def add_elegant_style():
 add_elegant_style()
 
 # ------------------------------------------------
-# Load model and tokenizer
+# Load Model + Tokenizer
 # ------------------------------------------------
 @st.cache_resource
 def load_model_and_tokenizer():
@@ -135,7 +135,7 @@ def load_model_and_tokenizer():
 model, tokenizer = load_model_and_tokenizer()
 
 # ------------------------------------------------
-# Label Mapping
+# Label Mapping + Resources
 # ------------------------------------------------
 label_mapping = {
     0: "anxiety",
@@ -147,9 +147,6 @@ label_mapping = {
     6: "suicidal"
 }
 
-# ------------------------------------------------
-# Helpful Resources
-# ------------------------------------------------
 resources = {
     "anxiety": [
         "Try slow breathing: inhale 4s, hold 4s, exhale 6s.",
@@ -192,9 +189,7 @@ resources = {
 # Streamlit UI
 # ------------------------------------------------
 st.markdown("<div class='main-header'>🧠 Mind Lens</div>", unsafe_allow_html=True)
-
 st.markdown("<div class='content-box'>", unsafe_allow_html=True)
-
 st.markdown("<p class='intro-text'>Let your words reveal your emotional tone. Mind Lens helps you explore, understand, and find balance with care and empathy.</p>", unsafe_allow_html=True)
 
 user_text = st.text_area("💬 Type or paste your text here:", height=150)
@@ -203,31 +198,42 @@ if st.button("✨ Analyze Now"):
     if not user_text.strip():
         st.warning("⚠️ Please enter some text.")
     else:
-        # Translate text to English if needed
-        try:
-            english_text = GoogleTranslator(source='auto', target='en').translate(user_text)
-            st.info("🌍 Text translated to English (if needed).")
-            st.markdown(f"**Translated text:** {english_text}")
-        except Exception:
-            english_text = user_text
-            st.warning("⚠️ Translation service unavailable — using original text.")
+        with st.spinner("🧠 Analyzing your text... please wait"):
+            time.sleep(1.5)
 
-        # Tokenize and predict
-        inputs = tokenizer(english_text, return_tensors="pt", truncation=True, padding=True, max_length=128)
-        with torch.no_grad():
-            outputs = model(**inputs)
-            pred_class = torch.argmax(outputs.logits, dim=1).item()
+            # Translate
+            try:
+                english_text = GoogleTranslator(source='auto', target='en').translate(user_text)
+                st.info("🌍 Text translated to English (if needed).")
+                st.markdown(f"**Translated text:** {english_text}")
+            except Exception:
+                english_text = user_text
+                st.warning("⚠️ Translation unavailable — using original text.")
 
-        label = label_mapping.get(pred_class, "Unknown")
-        st.success(f"**🩺 Predicted Mental Health Category:** {label.upper()}")
+            # Predict
+            inputs = tokenizer(english_text, return_tensors="pt", truncation=True, padding=True, max_length=128)
+            with torch.no_grad():
+                outputs = model(**inputs)
+                pred_class = torch.argmax(outputs.logits, dim=1).item()
 
-        # Display helpful resources
-        st.markdown("<hr>", unsafe_allow_html=True)
-        st.subheader("💡 Helpful Suggestions & Resources:")
+            label = label_mapping.get(pred_class, "Unknown")
+
+        # Fade-in results
+        st.markdown(
+            f"""
+            <div class='fade-in'>
+                <h3>🩺 Predicted Mental Health Category:</h3>
+                <p style='font-size:22px; font-weight:600; color:#0077b6;'>{label.upper()}</p>
+                <hr>
+                <h4>💡 Helpful Suggestions & Resources:</h4>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
         for tip in resources.get(label, []):
             st.markdown(f"- {tip}")
 
-        # Disclaimer
         st.markdown("<hr>", unsafe_allow_html=True)
         st.caption("⚠️ This tool is for informational support only and does not replace professional mental health advice.")
         st.caption("⚠️ Translations may not be perfect; always seek local professional help when needed.")
