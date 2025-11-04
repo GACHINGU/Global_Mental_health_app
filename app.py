@@ -7,6 +7,11 @@ from transformers import RobertaTokenizer, RobertaForSequenceClassification
 from deep_translator import GoogleTranslator
 import time
 
+# ---------------------------
+# Page config
+# ---------------------------
+st.set_page_config(page_title="Mind Lens — Futuristic", layout="centered", initial_sidebar_state="collapsed")
+
 # ------------------------------------------------
 # Load model and tokenizer directly from Hugging Face
 # (UNCHANGED logic)
@@ -75,95 +80,113 @@ resources = {
 }
 
 # ------------------------------------------------
-# FUTURISTIC THEME + SCANNING LOADER (styling only)
+# FUTURISTIC DARK->BLUE ANIMATED GLOW THEME
 # ------------------------------------------------
-st.set_page_config(page_title="Mind Lens — Futuristic", layout="centered")
-
 st.markdown(
     """
     <style>
-    /* PAGE BACKGROUND */
+    /* Base page */
     .stApp {
-        background: radial-gradient(circle at 10% 20%, #071426, #031014 40%, #00060a 100%);
+        background: linear-gradient(180deg, #030416 0%, #041229 35%, #001428 70%, #000814 100%);
         color: #e6f7ff;
         font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+        min-height: 100vh;
     }
 
-    /* Holographic title */
-    .title {
-        font-size: 36px;
-        font-weight: 800;
-        text-align: center;
-        margin-bottom: 6px;
-        background: linear-gradient(90deg, #8ef0ff, #00d4ff 40%, #00a0ff 75%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        filter: drop-shadow(0 6px 18px rgba(0,160,255,0.18));
+    /* animated glow overlay */
+    .glow-anim {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        background:
+            radial-gradient(800px 300px at 10% 20%, rgba(0,160,255,0.06), transparent 10%),
+            radial-gradient(600px 240px at 90% 80%, rgba(0,120,255,0.05), transparent 12%);
+        animation: slowPulse 8s ease-in-out infinite;
+        mix-blend-mode: screen;
+    }
+    @keyframes slowPulse {
+        0% { opacity: 0.85; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.02); }
+        100% { opacity: 0.86; transform: scale(1); }
     }
 
-    .subtitle {
-        text-align: center;
-        color: #9fbfcf;
-        margin-bottom: 18px;
-        font-size: 14.5px;
-    }
-
-    /* Center floating card */
+    /* container card */
     .card {
-        width: 820px;
-        max-width: 94%;
-        margin: 18px auto;
-        background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+        position: relative;
+        z-index: 1;
+        width: 860px;
+        max-width: 96%;
+        margin: 28px auto;
+        background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
         border-radius: 14px;
-        padding: 22px;
+        padding: 24px;
         box-shadow:
-            0 8px 30px rgba(0,0,0,0.6),
+            0 20px 60px rgba(0,4,12,0.75),
             inset 0 1px 0 rgba(255,255,255,0.02);
         border: 1px solid rgba(0,200,255,0.06);
         backdrop-filter: blur(6px);
     }
 
-    /* Text area: dark with cyan glow */
+    /* holographic title */
+    .title {
+        display:block;
+        text-align:center;
+        font-size:36px;
+        font-weight:800;
+        letter-spacing:1.6px;
+        margin-bottom:6px;
+        background: linear-gradient(90deg, #bff9ff, #00d4ff 36%, #00a0ff 76%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 8px 30px rgba(0,160,255,0.12));
+    }
+
+    .subtitle {
+        text-align:center;
+        color:#9db9c8;
+        margin-bottom:18px;
+        font-size:14.5px;
+    }
+
+    /* neon text area */
     textarea {
-        background-color: #071420 !important;
+        background-color: #06131b !important;
         color: #eafcff !important;
         border-radius: 12px !important;
         border: 1px solid rgba(0,160,255,0.18) !important;
-        padding: 12px !important;
+        padding: 14px !important;
         font-size: 15.5px !important;
-        box-shadow: 0 6px 18px rgba(0,160,255,0.03);
+        box-shadow: 0 8px 24px rgba(0,160,255,0.02);
+        transition: box-shadow 0.18s ease, transform 0.12s ease;
     }
     textarea:focus {
-        box-shadow: 0 0 28px rgba(0,170,255,0.18) !important;
+        box-shadow: 0 0 28px rgba(0,170,255,0.16) !important;
+        transform: translateY(-2px);
         outline: none !important;
     }
 
-    /* Button: neon */
+    /* neon button */
     div.stButton > button {
-        background: linear-gradient(90deg, rgba(0, 210, 255, 0.14), rgba(0, 160, 255, 0.14));
+        background: linear-gradient(90deg, rgba(0,210,255,0.12), rgba(0,160,255,0.08));
         color: #eaffff;
         border: 1px solid rgba(0,160,255,0.6);
         border-radius: 12px;
         padding: 12px 18px;
-        font-weight: 700;
+        font-weight: 800;
         font-size: 15.5px;
+        letter-spacing: 0.6px;
         transition: transform 0.16s ease, box-shadow 0.16s ease;
     }
     div.stButton > button:hover {
-        transform: translateY(-4px) scale(1.01);
-        box-shadow: 0 10px 30px rgba(0,160,255,0.18), 0 0 40px rgba(0,160,255,0.06) inset;
+        transform: translateY(-5px) scale(1.01);
+        box-shadow: 0 20px 60px rgba(0,160,255,0.12), 0 0 40px rgba(0,160,255,0.06) inset;
     }
 
-    /* Results & resource headers */
-    h3, h4 {
-        color: #bfefff;
-        font-weight: 700;
-    }
-    p, li {
-        color: #cfeff7;
-    }
+    /* result headings */
+    h3, h4 { color: #cfeff7; font-weight:700; }
+    p, li { color: #d6f2fb; }
 
-    /* separators */
     hr {
         border: 0;
         height: 1px;
@@ -171,94 +194,88 @@ st.markdown(
         margin: 18px 0;
     }
 
-    /* Footer */
     .footer {
-        text-align: center;
-        font-size: 13px;
-        color: #7f98a6;
-        margin-top: 12px;
+        text-align:center;
+        color:#7f98a6;
+        font-size:13px;
+        margin-top:14px;
     }
 
-    /* --- SCANNING LOADER --- */
+    /* scanner loader elements (in-card) */
     .scanner {
-        width: 100%;
-        height: 60px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        width:100%;
+        height:56px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap:14px;
     }
-    .scanner .orb {
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
+    .orb {
+        width:18px;
+        height:18px;
+        border-radius:50%;
         background: radial-gradient(circle at 30% 30%, #bff9ff, #00d4ff 50%, #008cff 100%);
-        box-shadow: 0 0 20px rgba(0,212,255,0.45), 0 0 60px rgba(0,160,255,0.08);
-        animation: pulse 1.4s linear infinite;
-        margin-right: 12px;
+        box-shadow: 0 0 22px rgba(0,212,255,0.45), 0 0 60px rgba(0,160,255,0.08);
+        animation: orbPulse 1.4s linear infinite;
     }
-    .scanner .bar {
-        width: 60%;
-        height: 6px;
-        border-radius: 999px;
-        background: linear-gradient(90deg, rgba(0,160,255,0.2), rgba(0,212,255,0.3));
-        position: relative;
-        overflow: hidden;
+    .bar {
+        width:62%;
+        height:8px;
+        border-radius:999px;
+        background: linear-gradient(90deg, rgba(0,160,255,0.14), rgba(0,212,255,0.22));
+        position:relative;
+        overflow:hidden;
     }
-    .scanner .bar::before {
+    .bar::before {
         content: "";
-        position: absolute;
-        left: -30%;
-        width: 30%;
-        height: 100%;
-        background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.25), rgba(255,255,255,0.06));
+        position:absolute;
+        left:-28%;
+        width:30%;
+        height:100%;
+        background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.24), rgba(255,255,255,0.06));
         transform: skewX(-25deg);
-        animation: sweep 1.6s ease-in-out infinite;
+        animation: sweep 1.5s ease-in-out infinite;
     }
-    @keyframes sweep {
-        0% { left: -30%; }
-        50% { left: 80%; }
-        100% { left: -30%; }
-    }
-    @keyframes pulse {
-        0% { transform: scale(0.9); opacity: 0.85; }
-        50% { transform: scale(1.16); opacity: 1; }
-        100% { transform: scale(0.9); opacity: 0.85; }
-    }
+    @keyframes sweep { 0% { left:-28%; } 50% { left:84%; } 100% { left:-28%; } }
+    @keyframes orbPulse { 0% { transform:scale(0.9); opacity:0.85 } 50% { transform:scale(1.15); opacity:1 } 100% { transform:scale(0.9); opacity:0.85 } }
 
-    /* subtle floating card animation on load */
+    /* floating card animation */
     .card { transform: translateY(6px); animation: floatUp 0.7s ease forwards; }
-    @keyframes floatUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes floatUp { from { opacity:0; transform:translateY(20px);} to {opacity:1; transform:translateY(0);} }
 
-    /* Responsive */
-    @media (max-width: 800px) {
-        .card { width: 94% !important; padding: 18px; }
-        h1 { font-size: 28px; }
+    /* responsive tweaks */
+    @media (max-width: 880px) {
+        .card { width:94% !important; padding:18px; }
+        .title { font-size:28px; }
     }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-# ------------------------------------------------
-# PAGE LAYOUT
-# ------------------------------------------------
+# animated glow overlay element
+st.markdown("<div class='glow-anim'></div>", unsafe_allow_html=True)
+
+# ---------------------------
+# Layout card start
+# ---------------------------
 st.markdown("<div class='card'>", unsafe_allow_html=True)
-st.markdown("<div style='text-align:center'><h1 class='title'>MIND LENS</h1></div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align:center'><span class='title'>MIND LENS</span></div>", unsafe_allow_html=True)
 st.markdown("<div class='subtitle'>Futuristic AI dashboard — type your text and let the scanner analyze emotional tone.</div>", unsafe_allow_html=True)
 
-# Input area (kept functionality)
+# Input area (functionality preserved)
 user_text = st.text_area("💬 Type or paste your text here:", height=170)
 
-# BUTTON + SCANNER behaviour:
+# Analyze button
 analyze_clicked = st.button("🔎 ANALYZE (SCAN)")
 
 if analyze_clicked:
     if not user_text.strip():
         st.warning("⚠️ Please enter some text.")
     else:
-        # show scanning loader (custom HTML) while processing
-        loader_placeholder = st.empty()
-        loader_placeholder.markdown(
+        # show scanning loader HTML while processing
+        loader = st.empty()
+        loader.markdown(
             """
             <div class="scanner">
                 <div class="orb"></div>
@@ -269,10 +286,10 @@ if analyze_clicked:
             unsafe_allow_html=True,
         )
 
-        # small artificial wait for UX (keeps loader visible for a moment)
+        # brief UX pause so the scan feels deliberate
         time.sleep(0.6)
 
-        # --- TRANSLATE (unchanged) ---
+        # TRANSLATION (unchanged)
         try:
             english_text = GoogleTranslator(source='auto', target='en').translate(user_text)
             st.info("🌍 Text has been translated to English (if needed).")
@@ -281,7 +298,7 @@ if analyze_clicked:
             english_text = user_text
             st.warning("⚠️ Translation service unavailable — using original text.")
 
-        # --- MODEL PREDICTION (unchanged) ---
+        # MODEL PREDICTION (unchanged)
         inputs = tokenizer(english_text, return_tensors="pt", truncation=True, padding=True, max_length=128)
         with torch.no_grad():
             outputs = model(**inputs)
@@ -289,11 +306,11 @@ if analyze_clicked:
 
         label = label_mapping.get(pred_class, "Unknown")
 
-        # small UX pause so scanning feels deliberate
+        # small UX pause
         time.sleep(0.45)
 
-        # remove loader and show results (keep same content)
-        loader_placeholder.empty()
+        # remove loader and show results
+        loader.empty()
 
         st.success(f"🩺 Predicted Mental Health Category: **{label.upper()}**")
 
@@ -306,6 +323,8 @@ if analyze_clicked:
         st.caption("⚠️ This tool is for informational support only and does not replace professional mental health advice.")
         st.caption("⚠️ Translations may not be perfect; always seek local professional help when needed.")
 
+# close card
 st.markdown("</div>", unsafe_allow_html=True)
 
+# footer
 st.markdown("<div class='footer'>Made with ❤️ • Mind Lens • 2025</div>", unsafe_allow_html=True)
