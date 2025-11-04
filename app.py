@@ -5,137 +5,25 @@ import streamlit as st
 import torch
 from transformers import RobertaTokenizer, RobertaForSequenceClassification
 from deep_translator import GoogleTranslator
-import time
 
 # ------------------------------------------------
-# ✨ Elegant Styling (Fixed Text Visibility)
-# ------------------------------------------------
-def add_elegant_style():
-    st.markdown(
-        """
-        <style>
-        /* Global app */
-        .stApp {
-            background: linear-gradient(135deg, #eef6fb, #f9fbff);
-            font-family: 'Inter', sans-serif;
-            color: #1c1c1e;
-            transition: all 0.3s ease;
-        }
-
-        /* Header */
-        .main-header {
-            text-align: center;
-            background: linear-gradient(90deg, #0077b6, #0096c7);
-            color: white;
-            padding: 1.2rem;
-            border-radius: 0 0 20px 20px;
-            box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
-            font-size: 2rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-
-        /* Centered card */
-        .content-box {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 2.5rem;
-            box-shadow: 0px 6px 16px rgba(0,0,0,0.08);
-            width: 75%;
-            margin: 2rem auto;
-            max-width: 800px;
-            opacity: 0;
-            animation: fadeIn 1s forwards;
-        }
-
-        /* Buttons */
-        div.stButton > button {
-            background: linear-gradient(90deg, #0096c7, #00b4d8);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 0.8em 1.6em;
-            font-weight: 600;
-            font-size: 16px;
-            width: 100%;
-            transition: 0.3s;
-            box-shadow: 0px 3px 6px rgba(0, 150, 199, 0.3);
-        }
-        div.stButton > button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0px 5px 12px rgba(0, 150, 199, 0.4);
-            background: linear-gradient(90deg, #00b4d8, #0096c7);
-        }
-
-        /* Text area */
-        textarea {
-            background: #ffffff !important; /* Pure white */
-            color: #1a1a1a !important; /* Dark readable text */
-            border-radius: 10px !important;
-            border: 1px solid #d7e3eb !important;
-            font-size: 16px !important;
-            box-shadow: 0px 2px 6px rgba(0,0,0,0.05);
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            0% {opacity: 0; transform: translateY(15px);}
-            100% {opacity: 1; transform: translateY(0);}
-        }
-
-        /* Results animation */
-        .fade-in {
-            animation: fadeIn 1s ease-in-out forwards;
-        }
-
-        h2, h3 {
-            color: #0077b6;
-            margin-top: 25px;
-        }
-
-        .intro-text {
-            text-align: center;
-            font-size: 17px;
-            color: #495057;
-            margin-bottom: 1.5rem;
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            margin-top: 3rem;
-            font-size: 14px;
-            color: #6c757d;
-            padding: 1rem 0;
-        }
-        .footer a {
-            color: #0096c7;
-            text-decoration: none;
-        }
-        .footer a:hover {
-            text-decoration: underline;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-add_elegant_style()
-
-# ------------------------------------------------
-# Load Model + Tokenizer
+# Load model and tokenizer directly from Hugging Face
 # ------------------------------------------------
 @st.cache_resource
 def load_model_and_tokenizer():
-    repo_id = "Legend092/roberta-mentalhealth"
+    """
+    Load Roberta model and tokenizer from Hugging Face repo.
+    """
+    repo_id = "Legend092/roberta-mentalhealth"  # Hugging Face repo
     model = RobertaForSequenceClassification.from_pretrained(repo_id)
     tokenizer = RobertaTokenizer.from_pretrained(repo_id)
     return model, tokenizer
 
+# Initialize model and tokenizer
 model, tokenizer = load_model_and_tokenizer()
 
 # ------------------------------------------------
-# Label Mapping + Resources
+# Label Mapping
 # ------------------------------------------------
 label_mapping = {
     0: "anxiety",
@@ -147,6 +35,9 @@ label_mapping = {
     6: "suicidal"
 }
 
+# ------------------------------------------------
+# Helpful Resources
+# ------------------------------------------------
 resources = {
     "anxiety": [
         "Try slow breathing: inhale 4s, hold 4s, exhale 6s.",
@@ -186,60 +77,112 @@ resources = {
 }
 
 # ------------------------------------------------
+# 🌙 Dark Theme Styling
+# ------------------------------------------------
+st.markdown("""
+    <style>
+    /* Background */
+    .stApp {
+        background-color: #0b0f16;
+        color: #e8eaed;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* Title */
+    h1 {
+        color: #76c7c0;
+        text-align: center;
+        font-weight: 700;
+    }
+
+    /* Text Area */
+    textarea {
+        background-color: #1b1f27 !important;
+        color: #e8eaed !important;
+        border-radius: 10px !important;
+        border: 1px solid #30343b !important;
+    }
+
+    /* Buttons */
+    div.stButton > button {
+        background: linear-gradient(90deg, #00bcd4, #2196f3);
+        color: white;
+        border-radius: 10px;
+        border: none;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+    div.stButton > button:hover {
+        background: linear-gradient(90deg, #2196f3, #00bcd4);
+        transform: scale(1.03);
+    }
+
+    /* Info boxes */
+    .stAlert {
+        border-radius: 10px;
+        padding: 10px;
+    }
+
+    /* Section Headers */
+    h2, h3, h4 {
+        color: #00bcd4;
+        font-weight: 600;
+    }
+
+    /* Links */
+    a {
+        color: #4fc3f7 !important;
+        text-decoration: none !important;
+    }
+    a:hover {
+        text-decoration: underline !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# ------------------------------------------------
 # Streamlit UI
 # ------------------------------------------------
-st.markdown("<div class='main-header'>🧠 Mind Lens</div>", unsafe_allow_html=True)
-st.markdown("<div class='content-box'>", unsafe_allow_html=True)
-st.markdown("<p class='intro-text'>Let your words reveal your emotional tone. Mind Lens helps you explore, understand, and find balance with care and empathy.</p>", unsafe_allow_html=True)
+st.title("🧠 Mind Lens")
+
+st.markdown(
+    "<p style='text-align:center; color:#9aa0a6; font-size:17px;'>"
+    "Step in, let your words speak, explore emotions, find balance, and connect with care wherever you are."
+    "</p>",
+    unsafe_allow_html=True
+)
 
 user_text = st.text_area("💬 Type or paste your text here:", height=150)
 
-if st.button("✨ Analyze Now"):
+if st.button("🔍 Analyze"):
     if not user_text.strip():
         st.warning("⚠️ Please enter some text.")
     else:
-        with st.spinner("🧠 Analyzing your text... please wait"):
-            time.sleep(1.5)
+        # Translate text to English if needed
+        try:
+            english_text = GoogleTranslator(source='auto', target='en').translate(user_text)
+            st.info("🌍 Text has been translated to English (if needed).")
+            st.markdown(f"**Translated text:** {english_text}")
+        except Exception:
+            english_text = user_text
+            st.warning("⚠️ Translation service unavailable — using original text.")
 
-            # Translate
-            try:
-                english_text = GoogleTranslator(source='auto', target='en').translate(user_text)
-                st.info("🌍 Text translated to English (if needed).")
-                st.markdown(f"**Translated text:** {english_text}")
-            except Exception:
-                english_text = user_text
-                st.warning("⚠️ Translation unavailable — using original text.")
+        # Tokenize and predict
+        inputs = tokenizer(english_text, return_tensors="pt", truncation=True, padding=True, max_length=128)
+        with torch.no_grad():
+            outputs = model(**inputs)
+            pred_class = torch.argmax(outputs.logits, dim=1).item()
 
-            # Predict
-            inputs = tokenizer(english_text, return_tensors="pt", truncation=True, padding=True, max_length=128)
-            with torch.no_grad():
-                outputs = model(**inputs)
-                pred_class = torch.argmax(outputs.logits, dim=1).item()
+        label = label_mapping.get(pred_class, "Unknown")
+        st.success(f"**Predicted Mental Health Category:** {label.upper()}")
 
-            label = label_mapping.get(pred_class, "Unknown")
-
-        st.markdown(
-            f"""
-            <div class='fade-in'>
-                <h3>🩺 Predicted Mental Health Category:</h3>
-                <p style='font-size:22px; font-weight:600; color:#0077b6;'>{label.upper()}</p>
-                <hr>
-                <h4>💡 Helpful Suggestions & Resources:</h4>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
+        # Display helpful resources
+        st.markdown("---")
+        st.subheader("💬 Helpful Suggestions & Resources:")
         for tip in resources.get(label, []):
             st.markdown(f"- {tip}")
 
-        st.markdown("<hr>", unsafe_allow_html=True)
+        # Disclaimer
+        st.markdown("---")
         st.caption("⚠️ This tool is for informational support only and does not replace professional mental health advice.")
-        st.caption("⚠️ Translations may not be perfect; always seek local professional help when needed.")
-
-st.markdown("</div>", unsafe_allow_html=True)
-
-st.markdown(
-    "<div class='footer'>Made with ❤️ using <a href='https://streamlit.io' target='_blank'>Streamlit</a> | © 2025 Mind Lens</div>",
-    unsafe_allow_html=True
-)
+        st.caption("Disclaimer⚠️: Translations may not be perfect; always seek local professional help when needed.")
