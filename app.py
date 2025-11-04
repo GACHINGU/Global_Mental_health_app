@@ -82,7 +82,7 @@ st.markdown("""
     /* Background with overlay */
     [data-testid="stAppViewContainer"] {
         background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
-                    url("https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1950&q=80");
+                    url("https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1950&q=80"https://images.unsplash.com/photo-1593642532973-d31b6557fa68?auto=format&fit=crop&w=1950&q=80");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
