@@ -7,50 +7,79 @@ from transformers import RobertaTokenizer, RobertaForSequenceClassification
 from deep_translator import GoogleTranslator
 
 # ------------------------------------------------
-# 🌄 Add Extra Dark Background Image (from URL)
+# 🌈 Modern App Styling (no background image)
 # ------------------------------------------------
-def add_bg_from_url():
+def set_clean_style():
     st.markdown(
-        f"""
+        """
         <style>
-        .stApp {{
-            background-image: url("https://i.pinimg.com/1200x/52/2b/f6/522bf658539d16b7c2062163fb7660d9.jpg");
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }}
-        /* Extra dark overlay for maximum readability */
-        .stApp::before {{
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8); /* darkest overlay */
-            z-index: -1;
-        }}
+        /* Overall App Background */
+        .stApp {
+            background-color: #f9fafc;
+            color: #222;
+        }
+
+        /* Title and Subheader */
+        h1, h2, h3 {
+            color: #3b3b98;
+            font-weight: 700;
+        }
+
+        /* Buttons */
+        div.stButton > button {
+            background: linear-gradient(90deg, #4a69bd, #6a89cc);
+            color: white;
+            font-weight: bold;
+            border-radius: 10px;
+            padding: 0.6em 1.5em;
+            transition: 0.3s;
+        }
+        div.stButton > button:hover {
+            background: linear-gradient(90deg, #6a89cc, #4a69bd);
+            transform: scale(1.02);
+        }
+
+        /* Text Area */
+        textarea {
+            border-radius: 10px !important;
+            border: 1px solid #ced6e0 !important;
+            background-color: #f1f2f6 !important;
+            font-size: 16px !important;
+        }
+
+        /* Info and Results Boxes */
+        .stAlert {
+            border-radius: 10px !important;
+        }
+
+        /* Markdown text */
+        p, li {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* Footer text */
+        .stCaption {
+            font-size: 13px;
+            color: #555;
+        }
         </style>
         """,
         unsafe_allow_html=True
     )
 
-add_bg_from_url()
+set_clean_style()
 
 # ------------------------------------------------
 # Load model and tokenizer directly from Hugging Face
 # ------------------------------------------------
 @st.cache_resource
 def load_model_and_tokenizer():
-    """
-    Load Roberta model and tokenizer from Hugging Face repo.
-    """
-    repo_id = "Legend092/roberta-mentalhealth"  # Hugging Face repo
+    repo_id = "Legend092/roberta-mentalhealth"
     model = RobertaForSequenceClassification.from_pretrained(repo_id)
     tokenizer = RobertaTokenizer.from_pretrained(repo_id)
     return model, tokenizer
 
-# Initialize model and tokenizer
 model, tokenizer = load_model_and_tokenizer()
 
 # ------------------------------------------------
@@ -110,20 +139,22 @@ resources = {
 # ------------------------------------------------
 # Streamlit UI
 # ------------------------------------------------
-st.title("Mind Lens🔍")
+st.title("🧠 Mind Lens")
+st.markdown(
+    "<p style='font-size:18px;'>Step in, let your words speak. Explore emotions, find balance, and connect with care wherever you are.</p>",
+    unsafe_allow_html=True
+)
 
-st.markdown("Step in, let your words speak ,explore emotions, find balance, and connect with care wherever you are ")
+user_text = st.text_area("📝 Type or paste your text here:", height=150)
 
-user_text = st.text_area("Type or paste your text here:", height=150)
-
-if st.button("Analyze"):
+if st.button("🔍 Analyze"):
     if not user_text.strip():
         st.warning("⚠️ Please enter some text.")
     else:
         # Translate text to English if needed
         try:
             english_text = GoogleTranslator(source='auto', target='en').translate(user_text)
-            st.info("🌍 Text has been translated to English (if needed).")
+            st.info("🌍 Text translated to English (if needed).")
             st.markdown(f"**Translated text:** {english_text}")
         except Exception:
             english_text = user_text
@@ -140,11 +171,11 @@ if st.button("Analyze"):
 
         # Display helpful resources
         st.markdown("---")
-        st.subheader("💬 Helpful Suggestions & Resources:")
+        st.subheader("💬 Helpful Suggestions & Resources")
         for tip in resources.get(label, []):
             st.markdown(f"- {tip}")
 
         # Disclaimer
         st.markdown("---")
         st.caption("⚠️ This tool is for informational support only and does not replace professional mental health advice.")
-        st.caption("Disclaimer⚠️: Translations may not be perfect; always seek local professional help when needed.")
+        st.caption("⚠️ Translations may not be perfect; always seek local professional help when needed.")
