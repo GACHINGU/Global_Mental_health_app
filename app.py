@@ -11,9 +11,13 @@ import sqlite3
 import time
 
 # ---------------------------
-# Page config
+# Page configuration
 # ---------------------------
-st.set_page_config(page_title="Mind Lens — Futuristic", layout="centered", initial_sidebar_state="collapsed")
+st.set_page_config(
+    page_title="Mind Lens — Futuristic",
+    layout="centered",
+    initial_sidebar_state="collapsed"
+)
 
 # ---------------------------
 # Load model and tokenizer
@@ -28,11 +32,16 @@ def load_model_and_tokenizer():
 model, tokenizer = load_model_and_tokenizer()
 
 # ---------------------------
-# Label Mapping & Resources
+# Label mapping & resources
 # ---------------------------
 label_mapping = {
-    0: "anxiety", 1: "bipolar", 2: "depression", 3: "normal",
-    4: "personality disorder", 5: "stress", 6: "suicidal"
+    0: "anxiety",
+    1: "bipolar",
+    2: "depression",
+    3: "normal",
+    4: "personality disorder",
+    5: "stress",
+    6: "suicidal"
 }
 
 resources = {
@@ -74,7 +83,7 @@ resources = {
 }
 
 # ---------------------------
-# Initialize SQLite Database
+# Database setup
 # ---------------------------
 conn = sqlite3.connect("mind_lens.db", check_same_thread=False)
 c = conn.cursor()
@@ -99,7 +108,7 @@ conn.commit()
 user_id = st.sidebar.text_input("Enter your username", value="guest")
 
 # ---------------------------
-# Load previous user history
+# Load user history
 # ---------------------------
 if "history" not in st.session_state:
     st.session_state.history = []
@@ -251,12 +260,11 @@ elif page == "Global Insights":
         avg_stress = global_df.groupby('prediction')['stress_level'].mean()
         st.bar_chart(avg_stress)
 
-        st.subheader("Category-Specific Submission Trend Over Time")
+        st.subheader("Category Submission Trends Over Time")
         global_df['timestamp'] = pd.to_datetime(global_df['timestamp'])
         global_df['date'] = global_df['timestamp'].dt.date
         trend_by_category = global_df.groupby(['date', 'prediction']).size().unstack(fill_value=0)
         st.line_chart(trend_by_category)
-
     else:
         st.info("No global data available yet.")
     st.markdown("</div>", unsafe_allow_html=True)
