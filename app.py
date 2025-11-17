@@ -8,8 +8,6 @@ from deep_translator import GoogleTranslator
 import pandas as pd
 import time
 import datetime
-from io import BytesIO
-import speech_recognition as sr
 
 # ---------------------------
 # Page config
@@ -92,17 +90,10 @@ if "history" not in st.session_state:
 # Theme Switcher
 # ---------------------------
 theme_choice = st.sidebar.selectbox("Choose Theme", ["Futuristic Dark", "Calm Light"])
-
 if theme_choice == "Futuristic Dark":
-    background_css = """
-    background: linear-gradient(180deg, #030416 0%, #041229 35%, #001428 70%, #000814 100%);
-    color: #e6f7ff;
-    """
+    background_css = "background: linear-gradient(180deg, #030416 0%, #041229 35%, #001428 70%, #000814 100%); color: #e6f7ff;"
 else:
-    background_css = """
-    background: linear-gradient(180deg, #f0f4f8 0%, #d9e2ec 50%, #bcccdc 100%);
-    color: #0b3d91;
-    """
+    background_css = "background: linear-gradient(180deg, #f0f4f8 0%, #d9e2ec 50%, #bcccdc 100%); color: #0b3d91;"
 
 st.markdown(f"<style>.stApp {{{background_css}}}</style>", unsafe_allow_html=True)
 
@@ -113,26 +104,9 @@ st.markdown("<h1 style='text-align:center;'>MIND LENS</h1>", unsafe_allow_html=T
 st.markdown("<p style='text-align:center;'>Step in, let your words speak. Explore emotions, find balance, and connect with care.</p>", unsafe_allow_html=True)
 
 # ---------------------------
-# Audio Input Option
+# Text Input
 # ---------------------------
-use_audio = st.checkbox("Use Audio Input")
-if use_audio:
-    st.write("Click to record your voice (speech-to-text)")
-    audio_file = st.file_uploader("Upload or Record Audio", type=["wav","mp3"])
-    if audio_file:
-        recognizer = sr.Recognizer()
-        with sr.AudioFile(BytesIO(audio_file.read())) as source:
-            audio_data = recognizer.record(source)
-            try:
-                user_text = recognizer.recognize_google(audio_data)
-                st.text_area("Detected Text:", user_text, height=170)
-            except:
-                st.warning("Audio could not be recognized. Please type instead.")
-                user_text = st.text_area("Type your text here:", height=170)
-    else:
-        user_text = st.text_area("Type your text here:", height=170)
-else:
-    user_text = st.text_area("Type your text here:", height=170)
+user_text = st.text_area("Type your text here:", height=170)
 
 # ---------------------------
 # Quick questionnaire for personalized tips
@@ -149,9 +123,7 @@ if st.button("Analyze"):
     if not user_text.strip():
         st.warning("Please enter some text.")
     else:
-        # ---------------------------
         # Translation
-        # ---------------------------
         try:
             english_text = GoogleTranslator(source='auto', target='en').translate(user_text)
             st.info("Text translated to English.")
@@ -159,9 +131,7 @@ if st.button("Analyze"):
             english_text = user_text
             st.warning("Translation unavailable. Using original text.")
 
-        # ---------------------------
         # Model Prediction
-        # ---------------------------
         inputs = tokenizer(english_text, return_tensors="pt", truncation=True, padding=True, max_length=128)
         with torch.no_grad():
             outputs = model(**inputs)
@@ -171,15 +141,11 @@ if st.button("Analyze"):
 
         label = label_mapping.get(pred_class, "Unknown")
 
-        # ---------------------------
         # Text Insights
-        # ---------------------------
         keywords = [word for word in english_text.split() if word.lower() in label]
         insights = ", ".join(keywords) if keywords else "No specific keywords detected."
 
-        # ---------------------------
         # Save to history
-        # ---------------------------
         st.session_state.history.append({
             "datetime": datetime.datetime.now(),
             "text": user_text,
@@ -190,29 +156,23 @@ if st.button("Analyze"):
             "social_support": social_support
         })
 
-        # ---------------------------
         # Show Results
-        # ---------------------------
         st.success(f"Predicted Category: {label.upper()} (Confidence: {confidence*100:.1f}%)")
         st.info(f"Text Insights: {insights}")
 
         # Personalized Tips
         st.subheader("Helpful Suggestions")
         tips = resources.get(label, [])
-        # Adjust tips based on questionnaire
         if sleep_hours < 6:
             tips.append("Try to get at least 6-7 hours of sleep tonight.")
         if stress_level > 7:
             tips.append("Take a 10-minute mindfulness break to reduce stress.")
         if social_support < 5:
             tips.append("Reach out to a friend or family member for support.")
-
         for tip in tips:
             st.markdown(f"- {tip}")
 
-        # ---------------------------
         # Helpline Buttons
-        # ---------------------------
         st.subheader("Immediate Help")
         if label == "suicidal":
             st.markdown("<a href='tel:+0722178177'><button>Call Befrienders Kenya</button></a>", unsafe_allow_html=True)
