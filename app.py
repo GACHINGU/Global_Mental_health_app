@@ -6,8 +6,9 @@ import torch
 from transformers import RobertaTokenizer, RobertaForSequenceClassification
 from deep_translator import GoogleTranslator
 import pandas as pd
-import time
 import datetime
+import sqlite3
+import time
 
 # ---------------------------
 # Page config
@@ -73,7 +74,26 @@ resources = {
 }
 
 # ---------------------------
-# Session State for history
+# Initialize SQLite Database
+# ---------------------------
+conn = sqlite3.connect("mind_lens.db", check_same_thread=False)
+c = conn.cursor()
+c.execute('''
+    CREATE TABLE IF NOT EXISTS user_moods (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        timestamp TEXT,
+        text TEXT,
+        prediction TEXT,
+        confidence REAL,
+        sleep_hours INTEGER,
+        stress_level INTEGER,
+        social_support INTEGER
+    )
+''')
+conn.commit()
+
+# ---------------------------
+# Session State for current user history
 # ---------------------------
 if "history" not in st.session_state:
     st.session_state.history = []
@@ -146,6 +166,7 @@ if page == "Home":
             keywords = [word for word in english_text.split() if word.lower() in label]
             insights = ", ".join(keywords) if keywords else "No specific keywords detected."
 
+            # Save to session state
             st.session_state.history.append({
                 "datetime": datetime.datetime.now(),
                 "text": user_text,
@@ -156,6 +177,13 @@ if page == "Home":
                 "social_support": social_support
             })
 
+            # Save to database
+            c.execute('''
+                INSERT INTO user_moods (timestamp, text, prediction, confidence, sleep_hours, stress_level, social_support)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''', (datetime.datetime.now(), user_text, label, confidence, sleep_hours, stress_level, social_support))
+            conn.commit()
+
             st.success(f"Predicted Category: {label.upper()} (Confidence: {confidence*100:.1f}%)")
             st.info(f"Text Insights: {insights}")
 
@@ -165,11 +193,6 @@ if page == "Home":
             if stress_level > 7: tips.append("Take a 10-minute mindfulness break to reduce stress.")
             if social_support < 5: tips.append("Reach out to a friend or family member for support.")
             for tip in tips: st.markdown(f"- {tip}")
-
-            st.subheader("Immediate Help")
-            if label == "suicidal":
-                st.markdown("<a href='tel:+0722178177'><button>Call Befrienders Kenya</button></a>", unsafe_allow_html=True)
-                st.markdown("<a href='tel:988'><button>Call US Lifeline</button></a>", unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -183,7 +206,6 @@ elif page == "Mood History":
         df_history = pd.DataFrame(st.session_state.history)
         st.line_chart(df_history["confidence"])
         st.dataframe(df_history[["datetime","text","prediction","confidence","sleep_hours","stress_level","social_support"]])
-
         csv = df_history.to_csv(index=False).encode('utf-8')
         st.download_button("Download Mood & Analysis History", data=csv, file_name='mind_lens_history.csv', mime='text/csv')
     else:
@@ -196,10 +218,9 @@ elif page == "Mood History":
 elif page == "Category Trends":
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.markdown("<div class='title'>Category Trends</div>", unsafe_allow_html=True)
-    if st.session_state.history:
-        df_history = pd.DataFrame(st.session_state.history)
-        category_counts = df_history['prediction'].value_counts()
-        st.bar_chart(category_counts)
+    df_history = pd.DataFrame(st.session_state.history)
+    if not df_history.empty:
+        st.bar_chart(df_history['prediction'].value_counts())
     else:
         st.info("No data yet for trends.")
     st.markdown("</div>", unsafe_allow_html=True)
@@ -210,16 +231,24 @@ elif page == "Category Trends":
 elif page == "Global Insights":
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.markdown("<div class='title'>Global Insights</div>", unsafe_allow_html=True)
-    uploaded_files = st.file_uploader("Upload CSV files from multiple users", type="csv", accept_multiple_files=True)
-    if uploaded_files:
-        all_data = pd.concat([pd.read_csv(f) for f in uploaded_files])
-        st.subheader("Most Diagnosed Categories (Global)")
-        st.bar_chart(all_data['prediction'].value_counts())
+    global_df = pd.read_sql_query("SELECT * FROM user_moods", conn)
+    if not global_df.empty:
+        st.subheader("Most Diagnosed Categories")
+        st.bar_chart(global_df['prediction'].value_counts())
 
         st.subheader("Average Stress by Category")
-        avg_stress = all_data.groupby('prediction')['stress_level'].mean()
+        avg_stress = global_df.groupby('prediction')['stress_level'].mean()
         st.bar_chart(avg_stress)
+
+        st.subheader("Submission Trend Over Time")
+        global_df['timestamp'] = pd.to_datetime(global_df['timestamp'])
+        trend = global_df.groupby(global_df['timestamp'].dt.date)['id'].count()
+        st.line_chart(trend)
+    else:
+        st.info("No global data available yet.")
     st.markdown("</div>", unsafe_allow_html=True)
 
+# ---------------------------
 # Footer
+# ---------------------------
 st.markdown("<div class='footer'>Made with care • Mind Lens • 2025</div>", unsafe_allow_html=True)
