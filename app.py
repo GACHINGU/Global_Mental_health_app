@@ -87,7 +87,7 @@ if "history" not in st.session_state:
     st.session_state.history = []
 
 # ---------------------------
-# Apply Original Futuristic Dark-Blue Theme
+# Futuristic Dark-Blue Theme
 # ---------------------------
 st.markdown(
     """
@@ -153,7 +153,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Add glow overlay
+# Glow overlay
 st.markdown("<div class='glow-anim'></div>", unsafe_allow_html=True)
 
 # ---------------------------
@@ -166,13 +166,15 @@ st.markdown("<div class='subtitle'>Step in, let your words speak. Explore emotio
 # Text input
 user_text = st.text_area("Type your text here:", height=170)
 
-# Quick questionnaire for personalized tips
+# Quick check-in sliders
 st.markdown("### Quick Check-in")
 sleep_hours = st.slider("How many hours did you sleep last night?", 0, 12, 7)
 stress_level = st.slider("Current stress level (1-10)", 1, 10, 5)
 social_support = st.slider("Feeling socially supported? (1-10)", 1, 10, 5)
 
+# ---------------------------
 # Analyze button
+# ---------------------------
 if st.button("Analyze"):
     if not user_text.strip():
         st.warning("Please enter some text.")
@@ -195,11 +197,11 @@ if st.button("Analyze"):
 
         label = label_mapping.get(pred_class, "Unknown")
 
-        # Text Insights
+        # Text insights
         keywords = [word for word in english_text.split() if word.lower() in label]
         insights = ", ".join(keywords) if keywords else "No specific keywords detected."
 
-        # Save to history
+        # Save to session history
         st.session_state.history.append({
             "datetime": datetime.datetime.now(),
             "text": user_text,
@@ -232,12 +234,32 @@ if st.button("Analyze"):
             st.markdown("<a href='tel:+0722178177'><button>Call Befrienders Kenya</button></a>", unsafe_allow_html=True)
             st.markdown("<a href='tel:988'><button>Call US Lifeline</button></a>", unsafe_allow_html=True)
 
+# ---------------------------
 # Mood History
+# ---------------------------
 if st.session_state.history:
-    st.subheader("Mood History")
     df_history = pd.DataFrame(st.session_state.history)
+    st.subheader("Mood History")
     st.line_chart(df_history["confidence"])
     st.dataframe(df_history[["datetime","text","prediction","confidence","sleep_hours","stress_level","social_support"]])
+
+    # ---------------------------
+    # Export / Download History
+    # ---------------------------
+    csv = df_history.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="Download Mood & Analysis History",
+        data=csv,
+        file_name='mind_lens_history.csv',
+        mime='text/csv'
+    )
+
+    # ---------------------------
+    # Most Diagnosed Categories Bar Graph
+    # ---------------------------
+    st.subheader("Most Diagnosed Categories")
+    category_counts = df_history['prediction'].value_counts()
+    st.bar_chart(category_counts)
 
 # Footer
 st.markdown("<div class='footer'>Made with care • Mind Lens • 2025</div>", unsafe_allow_html=True)
