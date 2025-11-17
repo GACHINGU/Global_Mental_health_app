@@ -1,4 +1,4 @@
-# Mind Lens App (Rebuilt Clean Version)
+# Mind Lens App (User + Admin Login)
 
 import streamlit as st
 import sqlite3
@@ -12,7 +12,6 @@ from datetime import datetime
 def init_db():
     conn = sqlite3.connect("mindlens.db")
     c = conn.cursor()
-
     c.execute("""
         CREATE TABLE IF NOT EXISTS users(
             username TEXT PRIMARY KEY,
@@ -30,7 +29,6 @@ def init_db():
             date TEXT
         )
     """)
-
     conn.commit()
     conn.close()
 
@@ -62,7 +60,7 @@ def login_user(username, password):
     return data
 
 # -----------------------------
-# LAYOUT
+# LAYOUT FUNCTIONS
 # -----------------------------
 
 def show_home():
@@ -109,19 +107,25 @@ def show_admin():
 
     conn.close()
 
+# -----------------------------
+# PAGES
+# -----------------------------
 
-def show_login():
-    st.title("Login")
+def show_login(user_type="user"):
+    st.title(f"{user_type.capitalize()} Login")
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
 
-    if st.button("Login"):
+    if st.button(f"Login as {user_type.capitalize()}"):
         data = login_user(username, password)
         if data:
-            st.session_state.logged = True
-            st.session_state.username = username
-            st.session_state.role = data[0]
-            st.success("Logged in successfully.")
+            if user_type == "admin" and data[0] != "admin":
+                st.error("This is an admin login only.")
+            else:
+                st.session_state.logged = True
+                st.session_state.username = username
+                st.session_state.role = data[0]
+                st.success("Logged in successfully.")
         else:
             st.error("Invalid credentials.")
 
@@ -147,23 +151,27 @@ init_db()
 if "logged" not in st.session_state:
     st.session_state.logged = False
 
-menu = ["Home", "Login", "Sign Up"]
 if st.session_state.logged:
-    menu = ["Home"]
     if st.session_state.role == "admin":
-        menu.append("Admin")
-    menu.append("Logout")
+        menu = ["Home", "Admin", "Logout"]
+    else:
+        menu = ["Home", "Logout"]
+else:
+    menu = ["Home", "User Login", "Admin Login", "Sign Up"]
 
 choice = st.sidebar.radio("Navigation", menu)
 
 if choice == "Home":
     if not st.session_state.logged:
-        st.warning("Login required.")
+        st.warning("Please log in to access the app.")
     else:
         show_home()
 
-elif choice == "Login":
-    show_login()
+elif choice == "User Login":
+    show_login(user_type="user")
+
+elif choice == "Admin Login":
+    show_login(user_type="admin")
 
 elif choice == "Sign Up":
     show_signup()
@@ -173,5 +181,7 @@ elif choice == "Admin":
 
 elif choice == "Logout":
     st.session_state.logged = False
+    st.session_state.username = None
+    st.session_state.role = None
     st.success("Logged out.")
     st.experimental_rerun()
