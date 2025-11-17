@@ -163,8 +163,7 @@ if page == "Home":
                 confidence = torch.max(probs).item()
 
             label = label_mapping.get(pred_class, "Unknown")
-            keywords = [word for word in english_text.split() if word.lower() in label]
-            insights = ", ".join(keywords) if keywords else "No specific keywords detected."
+            insights = ", ".join([word for word in english_text.split() if word.lower() in label]) or "No specific keywords detected."
 
             # Save to session state
             st.session_state.history.append({
@@ -240,10 +239,12 @@ elif page == "Global Insights":
         avg_stress = global_df.groupby('prediction')['stress_level'].mean()
         st.bar_chart(avg_stress)
 
-        st.subheader("Submission Trend Over Time")
+        st.subheader("Category-Specific Submission Trend Over Time")
         global_df['timestamp'] = pd.to_datetime(global_df['timestamp'])
-        trend = global_df.groupby(global_df['timestamp'].dt.date)['id'].count()
-        st.line_chart(trend)
+        global_df['date'] = global_df['timestamp'].dt.date
+        trend_by_category = global_df.groupby(['date', 'prediction']).size().unstack(fill_value=0)
+        st.line_chart(trend_by_category)
+
     else:
         st.info("No global data available yet.")
     st.markdown("</div>", unsafe_allow_html=True)
