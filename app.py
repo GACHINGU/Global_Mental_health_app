@@ -11,13 +11,9 @@ import sqlite3
 import time
 
 # ---------------------------
-# Page configuration
+# Page config
 # ---------------------------
-st.set_page_config(
-    page_title="Mind Lens — Futuristic",
-    layout="centered",
-    initial_sidebar_state="collapsed"
-)
+st.set_page_config(page_title="Mind Lens — Futuristic", layout="centered", initial_sidebar_state="collapsed")
 
 # ---------------------------
 # Load model and tokenizer
@@ -32,16 +28,11 @@ def load_model_and_tokenizer():
 model, tokenizer = load_model_and_tokenizer()
 
 # ---------------------------
-# Label mapping & resources
+# Label Mapping & Resources
 # ---------------------------
 label_mapping = {
-    0: "anxiety",
-    1: "bipolar",
-    2: "depression",
-    3: "normal",
-    4: "personality disorder",
-    5: "stress",
-    6: "suicidal"
+    0: "anxiety", 1: "bipolar", 2: "depression", 3: "normal",
+    4: "personality disorder", 5: "stress", 6: "suicidal"
 }
 
 resources = {
@@ -83,14 +74,13 @@ resources = {
 }
 
 # ---------------------------
-# Database setup
+# Initialize SQLite Database
 # ---------------------------
 conn = sqlite3.connect("mind_lens.db", check_same_thread=False)
 c = conn.cursor()
 c.execute('''
     CREATE TABLE IF NOT EXISTS user_moods (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id TEXT,
         timestamp TEXT,
         text TEXT,
         prediction TEXT,
@@ -103,21 +93,10 @@ c.execute('''
 conn.commit()
 
 # ---------------------------
-# User login / identification
-# ---------------------------
-user_id = st.sidebar.text_input("Enter your username", value="guest")
-
-# ---------------------------
-# Load user history
+# Session State for current user history
 # ---------------------------
 if "history" not in st.session_state:
     st.session_state.history = []
-
-if user_id:
-    query = "SELECT * FROM user_moods WHERE user_id = ? ORDER BY timestamp"
-    user_df = pd.read_sql_query(query, conn, params=(user_id,))
-    if not user_df.empty:
-        st.session_state.history = user_df.to_dict('records')
 
 # ---------------------------
 # Futuristic Dark-Blue Theme
@@ -199,9 +178,9 @@ if page == "Home":
 
             # Save to database
             c.execute('''
-                INSERT INTO user_moods (user_id, timestamp, text, prediction, confidence, sleep_hours, stress_level, social_support)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (user_id, datetime.datetime.now(), user_text, label, confidence, sleep_hours, stress_level, social_support))
+                INSERT INTO user_moods (timestamp, text, prediction, confidence, sleep_hours, stress_level, social_support)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''', (datetime.datetime.now(), user_text, label, confidence, sleep_hours, stress_level, social_support))
             conn.commit()
 
             st.success(f"Predicted Category: {label.upper()} (Confidence: {confidence*100:.1f}%)")
@@ -260,11 +239,12 @@ elif page == "Global Insights":
         avg_stress = global_df.groupby('prediction')['stress_level'].mean()
         st.bar_chart(avg_stress)
 
-        st.subheader("Category Submission Trends Over Time")
+        st.subheader("Category-Specific Submission Trend Over Time")
         global_df['timestamp'] = pd.to_datetime(global_df['timestamp'])
         global_df['date'] = global_df['timestamp'].dt.date
         trend_by_category = global_df.groupby(['date', 'prediction']).size().unstack(fill_value=0)
         st.line_chart(trend_by_category)
+
     else:
         st.info("No global data available yet.")
     st.markdown("</div>", unsafe_allow_html=True)
