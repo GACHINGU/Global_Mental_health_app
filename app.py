@@ -1,199 +1,330 @@
+import os
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+
 import streamlit as st
-import sqlite3
-import hashlib
-from datetime import datetime
-import pandas as pd
+import torch
+from transformers import RobertaTokenizer, RobertaForSequenceClassification
+from deep_translator import GoogleTranslator
+import time
 
-# -----------------------------
-# DATABASE INIT
-# -----------------------------
+# ---------------------------
+# Page config
+# ---------------------------
+st.set_page_config(page_title="Mind Lens — Futuristic", layout="centered", initial_sidebar_state="collapsed")
 
-def init_db():
-    conn = sqlite3.connect("mindlens.db")
-    c = conn.cursor()
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS users(
-            username TEXT PRIMARY KEY,
-            password_hash TEXT NOT NULL,
-            role TEXT NOT NULL
-        )
-    """)
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS results(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT,
-            text_input TEXT,
-            prediction TEXT,
-            timestamp TEXT
-        )
-    """)
-    # Create default admin if not exists
-    c.execute("SELECT * FROM users WHERE username='admin'")
-    if not c.fetchone():
-        c.execute("INSERT INTO users VALUES (?,?,?)", ('admin', hashlib.sha256('admin123'.encode()).hexdigest(), 'admin'))
-    conn.commit()
-    conn.close()
+# ------------------------------------------------
+# Load model and tokenizer directly from Hugging Face
+# (UNCHANGED logic)
+# ------------------------------------------------
+@st.cache_resource
+def load_model_and_tokenizer():
+    repo_id = "Legend092/roberta-mentalhealth"
+    model = RobertaForSequenceClassification.from_pretrained(repo_id)
+    tokenizer = RobertaTokenizer.from_pretrained(repo_id)
+    return model, tokenizer
 
-# -----------------------------
-# UTILS
-# -----------------------------
+model, tokenizer = load_model_and_tokenizer()
 
-def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
+# ------------------------------------------------
+# Label Mapping (UNCHANGED)
+# ------------------------------------------------
+label_mapping = {
+    0: "anxiety",
+    1: "bipolar",
+    2: "depression",
+    3: "normal",
+    4: "personality disorder",
+    5: "stress",
+    6: "suicidal"
+}
 
-def verify_login(username, password):
-    conn = sqlite3.connect("mindlens.db")
-    c = conn.cursor()
-    c.execute("SELECT role FROM users WHERE username=? AND password_hash=?", (username, hash_password(password)))
-    res = c.fetchone()
-    conn.close()
-    return res[0] if res else None
+# ------------------------------------------------
+# Helpful Resources (UNCHANGED)
+# ------------------------------------------------
+resources = {
+    "anxiety": [
+        "Try slow breathing: inhale 4s, hold 4s, exhale 6s.",
+        "Visit: [https://www.anxietycentre.com](https://www.anxietycentre.com)",
+        "Talk to a trusted friend or counselor."
+    ],
+    "depression": [
+        "You’re not alone — reaching out helps more than you think.",
+        "Call your local helpline or message a friend.",
+        "Resource: [https://findahelpline.com](https://findahelpline.com)"
+    ],
+    "stress": [
+        "Take a short walk or stretch for 5 minutes.",
+        "Practice deep breathing or listen to calm music.",
+        "Resource: [https://www.stress.org](https://www.stress.org)"
+    ],
+    "bipolar": [
+        "Track your mood daily to notice patterns.",
+        "Keep routines consistent — especially sleep.",
+        "Learn more: [https://www.nami.org](https://www.nami.org)"
+    ],
+    "personality disorder": [
+        "Connecting with a therapist can really help you understand yourself.",
+        "Try journaling to track emotions and triggers.",
+        "Info: [https://www.mind.org.uk](https://www.mind.org.uk)"
+    ],
+    "suicidal": [
+        "If you feel unsafe, **please reach out now**.",
+        "Find help worldwide: [https://findahelpline.com](https://findahelpline.com)",
+        "In Kenya: Befrienders Kenya – 0722 178177",
+        "In the US: 988 Suicide & Crisis Lifeline"
+    ],
+    "normal": [
+        "You seem balanced right now — keep practicing healthy habits!",
+        "Maintain connections and regular breaks for mental wellness."
+    ]
+}
 
-# -----------------------------
-# USER & ADMIN FUNCTIONS
-# -----------------------------
+# ------------------------------------------------
+# FUTURISTIC DARK->BLUE ANIMATED GLOW THEME
+# ------------------------------------------------
+st.markdown(
+    """
+    <style>
+    /* Base page */
+    .stApp {
+        background: linear-gradient(180deg, #030416 0%, #041229 35%, #001428 70%, #000814 100%);
+        color: #e6f7ff;
+        font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+        min-height: 100vh;
+    }
 
-def create_user(username, password, role='user'):
-    try:
-        conn = sqlite3.connect("mindlens.db")
-        c = conn.cursor()
-        c.execute("INSERT INTO users VALUES (?,?,?)", (username, hash_password(password), role))
-        conn.commit()
-        conn.close()
-        return True
-    except:
-        return False
+    /* animated glow overlay */
+    .glow-anim {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        background:
+            radial-gradient(800px 300px at 10% 20%, rgba(0,160,255,0.06), transparent 10%),
+            radial-gradient(600px 240px at 90% 80%, rgba(0,120,255,0.05), transparent 12%);
+        animation: slowPulse 8s ease-in-out infinite;
+        mix-blend-mode: screen;
+    }
+    @keyframes slowPulse {
+        0% { opacity: 0.85; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.02); }
+        100% { opacity: 0.86; transform: scale(1); }
+    }
 
-def save_result(username, text_input, prediction):
-    conn = sqlite3.connect("mindlens.db")
-    c = conn.cursor()
-    c.execute("INSERT INTO results(username,text_input,prediction,timestamp) VALUES (?,?,?,?)", 
-              (username, text_input, prediction, str(datetime.now())))
-    conn.commit()
-    conn.close()
+    /* container card */
+    .card {
+        position: relative;
+        z-index: 1;
+        width: 860px;
+        max-width: 96%;
+        margin: 28px auto;
+        background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow:
+            0 20px 60px rgba(0,4,12,0.75),
+            inset 0 1px 0 rgba(255,255,255,0.02);
+        border: 1px solid rgba(0,200,255,0.06);
+        backdrop-filter: blur(6px);
+    }
 
-# -----------------------------
-# PAGE FUNCTIONS
-# -----------------------------
+    /* holographic title */
+    .title {
+        display:block;
+        text-align:center;
+        font-size:36px;
+        font-weight:800;
+        letter-spacing:1.6px;
+        margin-bottom:6px;
+        background: linear-gradient(90deg, #bff9ff, #00d4ff 36%, #00a0ff 76%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 8px 30px rgba(0,160,255,0.12));
+    }
 
-def page_home():
-    st.title("Mind Lens")
-    st.write("Your mental health check assistant.")
+    .subtitle {
+        text-align:center;
+        color:#9db9c8;
+        margin-bottom:18px;
+        font-size:14.5px;
+    }
 
-    if 'logged_in' not in st.session_state or not st.session_state.logged_in:
-        st.info("Please login to access the analysis page.")
-        return
+    /* neon text area */
+    textarea {
+        background-color: #06131b !important;
+        color: #eafcff !important;
+        border-radius: 12px !important;
+        border: 1px solid rgba(0,160,255,0.18) !important;
+        padding: 14px !important;
+        font-size: 15.5px !important;
+        box-shadow: 0 8px 24px rgba(0,160,255,0.02);
+        transition: box-shadow 0.18s ease, transform 0.12s ease;
+    }
+    textarea:focus {
+        box-shadow: 0 0 28px rgba(0,170,255,0.16) !important;
+        transform: translateY(-2px);
+        outline: none !important;
+    }
 
-    text_input = st.text_area("Enter your text here")
-    if st.button("Analyze"):
-        if not text_input.strip():
-            st.warning("Enter some text first.")
-            return
-        # Placeholder prediction logic (replace with your ML model)
-        prediction = 'Positive' if len(text_input) % 2 == 0 else 'Negative'
-        st.success(f"Prediction: {prediction}")
-        save_result(st.session_state.username, text_input, prediction)
-        # Option to download single result
-        df = pd.DataFrame([{'Text': text_input, 'Prediction': prediction}])
-        st.download_button("Download Result CSV", df.to_csv(index=False), file_name='result.csv')
+    /* neon button */
+    div.stButton > button {
+        background: linear-gradient(90deg, rgba(0,210,255,0.12), rgba(0,160,255,0.08));
+        color: #eaffff;
+        border: 1px solid rgba(0,160,255,0.6);
+        border-radius: 12px;
+        padding: 12px 18px;
+        font-weight: 800;
+        font-size: 15.5px;
+        letter-spacing: 0.6px;
+        transition: transform 0.16s ease, box-shadow 0.16s ease;
+    }
+    div.stButton > button:hover {
+        transform: translateY(-5px) scale(1.01);
+        box-shadow: 0 20px 60px rgba(0,160,255,0.12), 0 0 40px rgba(0,160,255,0.06) inset;
+    }
 
+    /* result headings */
+    h3, h4 { color: #cfeff7; font-weight:700; }
+    p, li { color: #d6f2fb; }
 
-def page_login(user_type='user'):
-    st.subheader(f"{user_type.capitalize()} Login")
-    username = st.text_input("Username")
-    password = st.text_input("Password", type='password')
-    if st.button(f"Login as {user_type.capitalize()}"):
-        role = verify_login(username, password)
-        if role:
-            if user_type=='admin' and role != 'admin':
-                st.error("Not authorized as admin.")
-                return
-            st.session_state.logged_in = True
-            st.session_state.username = username
-            st.session_state.role = role
-            st.success("Login successful!")
-        else:
-            st.error("Invalid credentials.")
+    hr {
+        border: 0;
+        height: 1px;
+        background: linear-gradient(90deg, rgba(0,160,255,0.12), rgba(255,255,255,0.02));
+        margin: 18px 0;
+    }
 
+    .footer {
+        text-align:center;
+        color:#7f98a6;
+        font-size:13px;
+        margin-top:14px;
+    }
 
-def page_signup():
-    st.subheader("Create Account")
-    username = st.text_input("Choose username")
-    password = st.text_input("Choose password", type='password')
-    if st.button("Sign Up"):
-        if create_user(username, password):
-            st.success("Account created. You can now login.")
-        else:
-            st.error("Username already exists.")
+    /* scanner loader elements (in-card) */
+    .scanner {
+        width:100%;
+        height:56px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap:14px;
+    }
+    .orb {
+        width:18px;
+        height:18px;
+        border-radius:50%;
+        background: radial-gradient(circle at 30% 30%, #bff9ff, #00d4ff 50%, #008cff 100%);
+        box-shadow: 0 0 22px rgba(0,212,255,0.45), 0 0 60px rgba(0,160,255,0.08);
+        animation: orbPulse 1.4s linear infinite;
+    }
+    .bar {
+        width:62%;
+        height:8px;
+        border-radius:999px;
+        background: linear-gradient(90deg, rgba(0,160,255,0.14), rgba(0,212,255,0.22));
+        position:relative;
+        overflow:hidden;
+    }
+    .bar::before {
+        content: "";
+        position:absolute;
+        left:-28%;
+        width:30%;
+        height:100%;
+        background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.24), rgba(255,255,255,0.06));
+        transform: skewX(-25deg);
+        animation: sweep 1.5s ease-in-out infinite;
+    }
+    @keyframes sweep { 0% { left:-28%; } 50% { left:84%; } 100% { left:-28%; } }
+    @keyframes orbPulse { 0% { transform:scale(0.9); opacity:0.85 } 50% { transform:scale(1.15); opacity:1 } 100% { transform:scale(0.9); opacity:0.85 } }
 
+    /* floating card animation */
+    .card { transform: translateY(6px); animation: floatUp 0.7s ease forwards; }
+    @keyframes floatUp { from { opacity:0; transform:translateY(20px);} to {opacity:1; transform:translateY(0);} }
 
-def page_admin():
-    if 'logged_in' not in st.session_state or not st.session_state.logged_in or st.session_state.role != 'admin':
-        st.warning("Admin access only.")
-        return
+    /* responsive tweaks */
+    @media (max-width: 880px) {
+        .card { width:94% !important; padding:18px; }
+        .title { font-size:28px; }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
-    st.title("Admin Dashboard")
-    conn = sqlite3.connect("mindlens.db")
-    c = conn.cursor()
-    c.execute("SELECT COUNT(*) FROM users")
-    total_users = c.fetchone()[0]
-    c.execute("SELECT COUNT(*) FROM results")
-    total_results = c.fetchone()[0]
+# animated glow overlay element
+st.markdown("<div class='glow-anim'></div>", unsafe_allow_html=True)
 
-    st.metric("Total Users", total_users)
-    st.metric("Total Analyses", total_results)
+# ---------------------------
+# Layout card start
+# ---------------------------
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+st.markdown("<div style='text-align:center'><span class='title'>MIND LENS</span></div>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>Step in, let your words speak. Explore emotions, find balance, and connect with care wherever you are.</div>", unsafe_allow_html=True)
 
-    st.subheader("Recent Results")
-    df = pd.read_sql_query("SELECT * FROM results ORDER BY timestamp DESC LIMIT 20", conn)
-    st.dataframe(df)
+# Input area (functionality preserved)
+user_text = st.text_area("💬 Type or paste your text here:", height=170)
 
-    st.subheader("Download All Results")
-    st.download_button("Download CSV", df.to_csv(index=False), file_name='all_results.csv')
+# Analyze button
+analyze_clicked = st.button("🔎 ANALYZE (SCAN)")
 
-    # Bar chart of predictions
-    st.subheader("Prediction Distribution")
-    chart_data = df['prediction'].value_counts().reset_index()
-    chart_data.columns = ['Prediction','Count']
-    st.bar_chart(chart_data.set_index('Prediction'))
-    conn.close()
-
-
-def page_about():
-    st.title("About Mind Lens")
-    st.write("Mind Lens is a mental health text analysis tool. Users can analyze their text and get a prediction. Admins can monitor usage and view results.")
-
-# -----------------------------
-# MAIN
-# -----------------------------
-
-init_db()
-if 'logged_in' not in st.session_state:
-    st.session_state.logged_in = False
-
-menu = ['Home','User Login','Admin Login','Sign Up','About']
-if st.session_state.logged_in:
-    if st.session_state.role=='admin':
-        menu = ['Home','Admin','Logout','About']
+if analyze_clicked:
+    if not user_text.strip():
+        st.warning("⚠️ Please enter some text.")
     else:
-        menu = ['Home','Logout','About']
+        # show scanning loader HTML while processing
+        loader = st.empty()
+        loader.markdown(
+            """
+            <div class="scanner">
+                <div class="orb"></div>
+                <div class="bar"></div>
+            </div>
+            <div style="text-align:center;color:#9fbfcf;font-size:13px;margin-top:-8px;">Scanning input & running analysis...</div>
+            """,
+            unsafe_allow_html=True,
+        )
 
-choice = st.sidebar.radio("Menu", menu)
+        # brief UX pause so the scan feels deliberate
+        time.sleep(0.6)
 
-if choice=='Home':
-    page_home()
-elif choice=='User Login':
-    page_login('user')
-elif choice=='Admin Login':
-    page_login('admin')
-elif choice=='Sign Up':
-    page_signup()
-elif choice=='Admin':
-    page_admin()
-elif choice=='About':
-    page_about()
-elif choice=='Logout':
-    st.session_state.logged_in=False
-    st.session_state.username=None
-    st.session_state.role=None
-    st.success("Logged out.")
-    st.experimental_rerun()
+        # TRANSLATION (unchanged)
+        try:
+            english_text = GoogleTranslator(source='auto', target='en').translate(user_text)
+            st.info("🌍 Text has been translated to English (if needed).")
+            st.markdown(f"**Translated text:** {english_text}")
+        except Exception:
+            english_text = user_text
+            st.warning("⚠️ Translation service unavailable — using original text.")
+
+        # MODEL PREDICTION (unchanged)
+        inputs = tokenizer(english_text, return_tensors="pt", truncation=True, padding=True, max_length=128)
+        with torch.no_grad():
+            outputs = model(**inputs)
+            pred_class = torch.argmax(outputs.logits, dim=1).item()
+
+        label = label_mapping.get(pred_class, "Unknown")
+
+        # small UX pause
+        time.sleep(0.45)
+
+        # remove loader and show results
+        loader.empty()
+
+        st.success(f"🩺 Predicted Mental Health Category: **{label.upper()}**")
+
+        st.markdown("<hr>", unsafe_allow_html=True)
+        st.subheader("💡 Helpful Suggestions & Resources:")
+        for tip in resources.get(label, []):
+            st.markdown(f"- {tip}")
+
+        st.markdown("<hr>", unsafe_allow_html=True)
+        st.caption("⚠️ This tool is for informational support only and does not replace professional mental health advice.")
+        st.caption("⚠️ Translations may not be perfect; always seek local professional help when needed.")
+
+# close card
+st.markdown("</div>", unsafe_allow_html=True)
+
+# footer
+st.markdown("<div class='footer'>Made with ❤️ • Mind Lens • 2025</div>", unsafe_allow_html=True)
