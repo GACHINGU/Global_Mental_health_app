@@ -87,38 +87,92 @@ if "history" not in st.session_state:
     st.session_state.history = []
 
 # ---------------------------
-# Theme Switcher
+# Apply Original Futuristic Dark-Blue Theme
 # ---------------------------
-theme_choice = st.sidebar.selectbox("Choose Theme", ["Futuristic Dark", "Calm Light"])
-if theme_choice == "Futuristic Dark":
-    background_css = "background: linear-gradient(180deg, #030416 0%, #041229 35%, #001428 70%, #000814 100%); color: #e6f7ff;"
-else:
-    background_css = "background: linear-gradient(180deg, #f0f4f8 0%, #d9e2ec 50%, #bcccdc 100%); color: #0b3d91;"
+st.markdown(
+    """
+    <style>
+    .stApp {
+        background: linear-gradient(180deg, #030416 0%, #041229 35%, #001428 70%, #000814 100%);
+        color: #e6f7ff;
+        font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+        min-height: 100vh;
+    }
+    .glow-anim {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        background:
+            radial-gradient(800px 300px at 10% 20%, rgba(0,160,255,0.06), transparent 10%),
+            radial-gradient(600px 240px at 90% 80%, rgba(0,120,255,0.05), transparent 12%);
+        animation: slowPulse 8s ease-in-out infinite;
+        mix-blend-mode: screen;
+    }
+    @keyframes slowPulse {
+        0% { opacity: 0.85; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.02); }
+        100% { opacity: 0.86; transform: scale(1); }
+    }
+    .card {
+        position: relative;
+        z-index: 1;
+        width: 860px;
+        max-width: 96%;
+        margin: 28px auto;
+        background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 20px 60px rgba(0,4,12,0.75), inset 0 1px 0 rgba(255,255,255,0.02);
+        border: 1px solid rgba(0,200,255,0.06);
+        backdrop-filter: blur(6px);
+        transform: translateY(6px);
+        animation: floatUp 0.7s ease forwards;
+    }
+    @keyframes floatUp { from { opacity:0; transform:translateY(20px);} to {opacity:1; transform:translateY(0);} }
+    .title { text-align:center; font-size:36px; font-weight:800; letter-spacing:1.6px; margin-bottom:6px;
+        background: linear-gradient(90deg, #bff9ff, #00d4ff 36%, #00a0ff 76%);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 8px 30px rgba(0,160,255,0.12));
+    }
+    .subtitle { text-align:center; color:#9db9c8; margin-bottom:18px; font-size:14.5px; }
+    textarea { background-color: #06131b !important; color: #eafcff !important; border-radius: 12px !important;
+        border: 1px solid rgba(0,160,255,0.18) !important; padding: 14px !important; font-size: 15.5px !important;
+        box-shadow: 0 8px 24px rgba(0,160,255,0.02); transition: box-shadow 0.18s ease, transform 0.12s ease;
+    }
+    textarea:focus { box-shadow: 0 0 28px rgba(0,170,255,0.16) !important; transform: translateY(-2px); outline: none !important; }
+    div.stButton > button { background: linear-gradient(90deg, rgba(0,210,255,0.12), rgba(0,160,255,0.08));
+        color: #eaffff; border: 1px solid rgba(0,160,255,0.6); border-radius: 12px; padding: 12px 18px; font-weight: 800; font-size: 15.5px; letter-spacing: 0.6px;
+        transition: transform 0.16s ease, box-shadow 0.16s ease;
+    }
+    div.stButton > button:hover { transform: translateY(-5px) scale(1.01); box-shadow: 0 20px 60px rgba(0,160,255,0.12), 0 0 40px rgba(0,160,255,0.06) inset; }
+    h3,h4,p,li { color: #d6f2fb; font-weight:700; }
+    hr { border:0; height:1px; background: linear-gradient(90deg, rgba(0,160,255,0.12), rgba(255,255,255,0.02)); margin:18px 0; }
+    .footer { text-align:center; color:#7f98a6; font-size:13px; margin-top:14px; }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
-st.markdown(f"<style>.stApp {{{background_css}}}</style>", unsafe_allow_html=True)
+# Add glow overlay
+st.markdown("<div class='glow-anim'></div>", unsafe_allow_html=True)
 
 # ---------------------------
-# Title & Subtitle
+# Layout Card
 # ---------------------------
-st.markdown("<h1 style='text-align:center;'>MIND LENS</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align:center;'>Step in, let your words speak. Explore emotions, find balance, and connect with care.</p>", unsafe_allow_html=True)
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+st.markdown("<div class='title'>MIND LENS</div>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>Step in, let your words speak. Explore emotions, find balance, and connect with care.</div>", unsafe_allow_html=True)
 
-# ---------------------------
-# Text Input
-# ---------------------------
+# Text input
 user_text = st.text_area("Type your text here:", height=170)
 
-# ---------------------------
 # Quick questionnaire for personalized tips
-# ---------------------------
 st.markdown("### Quick Check-in")
 sleep_hours = st.slider("How many hours did you sleep last night?", 0, 12, 7)
 stress_level = st.slider("Current stress level (1-10)", 1, 10, 5)
 social_support = st.slider("Feeling socially supported? (1-10)", 1, 10, 5)
 
-# ---------------------------
-# Analyze Button
-# ---------------------------
+# Analyze button
 if st.button("Analyze"):
     if not user_text.strip():
         st.warning("Please enter some text.")
@@ -156,11 +210,11 @@ if st.button("Analyze"):
             "social_support": social_support
         })
 
-        # Show Results
+        # Show results
         st.success(f"Predicted Category: {label.upper()} (Confidence: {confidence*100:.1f}%)")
         st.info(f"Text Insights: {insights}")
 
-        # Personalized Tips
+        # Personalized tips
         st.subheader("Helpful Suggestions")
         tips = resources.get(label, [])
         if sleep_hours < 6:
@@ -172,22 +226,19 @@ if st.button("Analyze"):
         for tip in tips:
             st.markdown(f"- {tip}")
 
-        # Helpline Buttons
+        # Helpline buttons
         st.subheader("Immediate Help")
         if label == "suicidal":
             st.markdown("<a href='tel:+0722178177'><button>Call Befrienders Kenya</button></a>", unsafe_allow_html=True)
             st.markdown("<a href='tel:988'><button>Call US Lifeline</button></a>", unsafe_allow_html=True)
 
-# ---------------------------
-# Mood History Visualization
-# ---------------------------
+# Mood History
 if st.session_state.history:
     st.subheader("Mood History")
     df_history = pd.DataFrame(st.session_state.history)
     st.line_chart(df_history["confidence"])
     st.dataframe(df_history[["datetime","text","prediction","confidence","sleep_hours","stress_level","social_support"]])
 
-# ---------------------------
 # Footer
-# ---------------------------
-st.markdown("<hr><p style='text-align:center;'>Made with care • Mind Lens • 2025</p>", unsafe_allow_html=True)
+st.markdown("<div class='footer'>Made with care • Mind Lens • 2025</div>", unsafe_allow_html=True)
+st.markdown("</div>", unsafe_allow_html=True)
